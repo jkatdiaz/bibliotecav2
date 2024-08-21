@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+.text-font {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+ion-menu::part(backdrop) {
+  background-color: rgba(0, 24, 141, 0.605);
+}
+
+ion-menu::part(container) {
+  border-radius: 0 20px 20px 0;
+
+  box-shadow: 4px 0px 16px rgba(233, 234, 239, 0.18);
+}
+
+.imagenes-card {
+  max-width: 100%;
+}
+
+.tamaño-letra-card {
+  font-size: 20px;
+  text-align: center;
+}
+
+:root {
+  --background: rgb(208, 228, 243);
+  /* Ajusta según el color deseado */
+}
+
+.custom-background {
+  background-color: rgb(208, 228, 243) !important;
+  /* min-height: 100vh; */
+  /* Asegúrate de que el fondo cubra toda la altura */
+}
+
+.custom-content-background {
+  background-color: rgb(208, 228, 243) !important;
+}
+
+.card-valores {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+}
+
+.card-carreras-item {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 58px;
+  color: darkslategrey;
+}
+
+.card-carreras {
+  display: flex;
+  justify-content: center;
+
+  height: 85vh
+}
+
+.tamaño-letra-card-carreras {
+  font-size: 15px;
+  text-align: center;
+}
+
+.espacios-cards {
+
+  margin: 17px;
+  box-shadow: 0 3px 12px rgb(4 76 165 / 50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Centra verticalmente */
+  justify-content: center
+}
+
+.scrollable-container {
+  /* height: 300px; Ajusta la altura según tus necesidades */
+  overflow-y: auto;
+}
+
+.boton-volver {
+  width: 120px;
+  padding: 14px 0px 0px 29px;
+}
