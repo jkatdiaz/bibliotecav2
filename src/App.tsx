@@ -10,6 +10,8 @@ import Mision from './components/Mision';
 import Vision from './components/Vision';
 import Reseña from './components/Reseña';
 import Objetivos from './components/Objetivos';
+import Bienvenida from './components/Bienvenida';
+import PerfilUsuario from './components/PerfilUsuario';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -59,6 +61,8 @@ const App: React.FC = () => (
         <Route exact path="/vision" component={Vision} />
         <Route exact path="/reseña" component={Reseña} />
         <Route exact path="/objetivos" component={Objetivos} />
+        <Route exact path="/bienvenida" component={Bienvenida} />
+        <Route exact path="/perfilusuario" component={PerfilUsuario} />
         
         <Route exact path="/">
           <Redirect to="/home" />

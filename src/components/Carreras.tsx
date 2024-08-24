@@ -20,14 +20,9 @@ import {
     IonRouterLink
 } from '@ionic/react';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComputer } from '@fortawesome/free-solid-svg-icons';
-import { faHelmetSafety } from '@fortawesome/free-solid-svg-icons';
-import { faGears } from '@fortawesome/free-solid-svg-icons'
-import { faPlugCircleCheck } from '@fortawesome/free-solid-svg-icons'
-import { faJar } from '@fortawesome/free-solid-svg-icons'
-import { faTractor } from '@fortawesome/free-solid-svg-icons'
-import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons'
+import { faComputer, faHelmetSafety, faGears, faPlugCircleCheck, faJar, faTractor,faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 
 import Drawer from './Drawer';
 import './styles.css';
@@ -45,14 +40,14 @@ function Carreras() {
                         <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
                     </IonToolbar>
                 </IonHeader>
-                <IonRouterLink href="/menu">
+                <Link to="/menu" className="no-underline">
                     <IonButton className="boton-volver" shape="round" color="medium">
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />
                         <div className="text-font" style={{ textTransform: 'capitalize' }}>
                             Atrás
                         </div>
                     </IonButton>
-                </IonRouterLink>
+                </Link>
 
                 <IonRow className='card-carreras'>
                     <IonCol size="6" size-sm="6" size-md="4" size-lg="3">

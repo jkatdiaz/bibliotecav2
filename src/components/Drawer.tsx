@@ -1,29 +1,43 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonToolbar, IonButtons,IonMenuButton,IonTitle,IonContent,IonHeader, IonPage,IonMenu} from "@ionic/react"
-import React from "react"
-function Drawer() {
-    return (
+import React, { useState, useRef } from 'react';
+import { IonMenu, IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/react';
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
+const Drawer: React.FC = () => {
+    const menuRef = useRef<HTMLIonMenuElement>(null);
+
+    const handleButtonClick = () => {
+        if (menuRef.current) {
+            menuRef.current.close();
+        }
+    };
+
+    return (
         <>
-            <IonMenu contentId="main-content">
+            <IonMenu ref={menuRef} contentId="main-content">
                 <IonHeader>
                     <IonToolbar color="dark">
                         <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
                     </IonToolbar>
                 </IonHeader>
-                <IonContent className="ion-padding">This is the menu content.</IonContent>
+
+                <IonContent className="ion-padding">
+                    <Link to="/perfilusuario">
+                        <IonButton
+                            fill="clear"
+                            className="text-font"
+                            style={{ textTransform: 'capitalize', color: 'black', fontSize: '20px' }}
+                            onClick={handleButtonClick}
+                        >
+                            <FontAwesomeIcon style={{ paddingRight: '12px' }} icon={faUser} />
+                            Mi Cuenta
+                        </IonButton>
+                    </Link>
+                </IonContent>
             </IonMenu>
-
-
-            {/* <IonHeader>
-                <IonToolbar>
-                    <IonButtons slot="start">
-                        <IonMenuButton></IonMenuButton>
-                    </IonButtons>
-                    <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
-                </IonToolbar>
-            </IonHeader> */}
         </>
-    )
+    );
 };
 
-export default Drawer
+export default Drawer;

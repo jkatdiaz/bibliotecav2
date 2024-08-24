@@ -2,6 +2,7 @@ import Drawer from './Drawer';
 import { IonCard, IonCardContent, IonButton, IonCardHeader, IonCardSubtitle, IonCardTitle, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonRouterLink, IonHeader, IonPage } from '@ionic/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons'
+import { Link } from 'react-router-dom';
 import './styles.css'
 function Reseña() {
     return (
@@ -17,14 +18,14 @@ function Reseña() {
                         <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
                     </IonToolbar>
                 </IonHeader>
-                <IonRouterLink href="/menu">
+                <Link to="/menu" className="no-underline">
                     <IonButton className="boton-volver" shape="round" color="medium">
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />
                         <div className="text-font" style={{ textTransform: 'capitalize' }}>
                             Atrás
                         </div>
                     </IonButton>
-                </IonRouterLink>
+                </Link>
                 <div className='card-valores '>
 
                     <IonCard className='text-font espacios-cards'>

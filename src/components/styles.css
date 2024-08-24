@@ -89,3 +89,174 @@ ion-menu::part(container) {
   width: 120px;
   padding: 14px 0px 0px 29px;
 }
+
+.welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* Ocupa toda la altura de la ventana */
+  /* background-color: #f8f9fa; */
+  /* Color de fondo opcional */
+}
+
+.welcome-content {
+  text-align: center;
+  width: 80%;
+  /* Ajusta el ancho según sea necesario */
+  max-width: 800px;
+  /* Ancho máximo para pantallas grandes */
+}
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  /* Espaciado igual entre tarjetas */
+  gap: 20px;
+  /* Espaciado entre las tarjetas */
+  /* margin-top: 20px; */
+  /* Espaciado superior para separar de la imagen */
+}
+
+.card-container {
+  /* margin: 20px 0; */
+}
+
+.welcome-image {
+  width: 100% !important;
+  /* Ajusta el tamaño según sea necesario */
+  max-width: 500px !important;
+  /* Ajusta el ancho máximo */
+  height: auto !important;
+  /* Mantiene la proporción de la imagen */
+  /* margin: 20px 0 !important; */
+  /* Espaciado alrededor de la imagen */
+}
+
+.div-imagen-perfil-usuario {
+
+    display: flex;
+    justify-content: center;
+}
+
+.imagen-perfil-usuario {
+  width: 100% !important;
+  /* Ajusta el tamaño según sea necesario */
+  max-width: 300px !important;
+  /* Ajusta el ancho máximo */
+  height: auto !important;
+  /* Mantiene la proporción de la imagen */
+  /* margin: 20px 0 !important; */
+  /* Espaciado alrededor de la imagen */
+}
+
+.card-datos-usuario{
+ 
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(208, 228, 243);
+
+}
+.no-underline {
+  text-decoration: none;
+}
+.inputs-datos-usuario{
+ 
+    text-align: center;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.18);
+    border-radius: 5px;
+    padding: 8px;
+
+}
+
+.carddos-datos-usuario {
+  border-radius: 20px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.67);
+}
+.card {
+  width: 170px; /* Ancho definido para las tarjetas */
+  height: 150px; /* Altura definida para las tarjetas */
+  display: flex;
+  flex-direction: column; /* Alinea el contenido verticalmente */
+  align-items: center; /* Centra el contenido horizontalmente */
+  justify-content: center; /* Centra el contenido verticalmente */
+  box-shadow: 0 3px 12px rgb(4 76 165 / 50%);
+
+}
+
+.bienvenida {
+
+  /* margin-bottom: 20px; */
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 2.5rem;
+  background: -webkit-linear-gradient(45deg, #a39796, #d5b2d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(45deg, #0038ff, #d5d7ff);
+  background-clip: text;
+  color: transparent;
+
+}
+
+.services {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 19px;
+  color: black;
+}
+
+/* Media Queries para hacer las tarjetas responsivas */
+@media (max-width: 768px) {
+  /*  */
+
+  .card {
+    width: 170px; /* Ancho definido para las tarjetas */
+    height: 65px; /* Altura definida para las tarjetas */
+    display: flex;
+    flex-direction: column; /* Alinea el contenido verticalmente */
+    align-items: center; /* Centra el contenido horizontalmente */
+    justify-content: center; /* Centra el contenido verticalmente */
+    box-shadow: 0 3px 12px rgb(4 76 165 / 50%);
+  }
+
+  .services {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 15px;
+    color: black;
+  }
+  .tamaño-letra-card {
+    font-size: 15px;
+    text-align: center;
+  }
+  
+}
+
+
+@media (max-width: 480px) {
+  .bienvenida {
+    font-size: 2rem; /* Tamaño de fuente más pequeño para pantallas muy pequeñas */
+  }
+
+  .imagen-perfil-usuario{
+    max-width: 200px !important
+  }
+
+  .welcome-image {
+    max-width: 100%; /* Ancho máximo completo para la imagen */
+  }
+
+  .card {
+    width: 100%; /* Tarjetas ocupan el ancho completo en pantallas muy pequeñas */
+  }
+}

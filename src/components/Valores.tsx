@@ -3,6 +3,7 @@ import { IonCard, IonRouterLink, IonCardContent, IonCardHeader, IonCardSubtitle,
 import './styles.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons'
+import { Link } from 'react-router-dom';
 function Valores() {
     return (
         <>
@@ -17,14 +18,14 @@ function Valores() {
                         <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
                     </IonToolbar>
                 </IonHeader>
-                <IonRouterLink href="/menu">
+                <Link to="/menu" className="no-underline">
                     <IonButton className="boton-volver" shape="round" color="medium">
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />
                         <div className="text-font" style={{ textTransform: 'capitalize' }}>
                             Atrás
                         </div>
                     </IonButton>
-                </IonRouterLink>
+                </Link>
                 <div className='card-valores '>
 
                     <IonCard className='text-font espacios-cards'>
