@@ -40,10 +40,10 @@ const Bienvenida: React.FC<{ username: string }> = ({ username }) => {
                         <img src={bienvenida} alt="Imagen de bienvenida" className="welcome-image" />
 
                         <div className="cards-container">
-                            <Link to="/menu" className="no-underline">
+                            <Link to="/libros" className="no-underline">
                                 <IonCard className=" clickable-card card">
                                     <IonCardHeader>
-                                        <h2 className='services' >Servicios</h2>
+                                        <h2 className='services' >Consultar libros</h2>
                                     </IonCardHeader>
 
                                 </IonCard>
