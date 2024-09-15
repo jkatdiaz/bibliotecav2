@@ -179,6 +179,9 @@ const Libros: React.FC = () => {
                                                     <Link to={`/editarlibro/${item.id}`}>
                                                         <button className="text-font">Editar</button>
                                                     </Link>
+                                                    <Link to={`/verlibro/${item.id}`}>
+                                                        <button className="text-font">Ver libro</button>
+                                                    </Link>
                                                 </IonCardContent>
                                             </IonCard>
                                         </IonCol>

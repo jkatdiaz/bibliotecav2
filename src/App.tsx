@@ -15,6 +15,7 @@ import PerfilUsuario from './components/PerfilUsuario';
 import Libros from './components/Libros';
 import SubirLibro  from './components/AgregarLibro';
 import EditarLibro from './components/EditarLibro';
+import VerLibro from './components/VerLibro';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -69,6 +70,7 @@ const App: React.FC = () => (
         <Route exact path="/libros" component={Libros} />
         <Route exact path="/subirlibro" component={SubirLibro} />
         <Route path="/editarlibro/:id" component={EditarLibro} />
+        <Route path="/verlibro/:id" component={VerLibro} />
         
         <Route exact path="/">
           <Redirect to="/home" />

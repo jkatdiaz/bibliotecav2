@@ -209,7 +209,7 @@ ion-menu::part(container) {
     width: 100% !important;
     background-color: rgba(0, 0, 0, 0.18) !important;
     border-radius: 5px !important;
-  
+  color: #000;
    font-size: 13px !important;
 
 }
@@ -314,7 +314,10 @@ ion-menu::part(container) {
 }
 
 
-
+.inputs-disabled{
+  color:#000 !important;
+  background-color:#f0f0f0 !important
+}
 
 /* Media Queries para hacer las tarjetas responsivas */
 @media (max-width: 768px) {

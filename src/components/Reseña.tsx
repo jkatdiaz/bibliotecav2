@@ -26,7 +26,7 @@ function Reseña() {
                         </div>
                     </IonButton>
                 </Link>
-                <div className='card-valores '>
+                <div className='card-valores scroll-container'>
 
                     <IonCard className='text-font espacios-cards'>
                         <IonCardHeader>

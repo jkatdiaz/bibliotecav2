@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { IonHeader, IonAlert, IonCard, IonCardContent, IonToolbar, IonRow, IonButtons, IonMenuButton, IonTitle, IonPage, IonInput, IonSelect, IonSelectOption, IonButton, IonLabel, IonItem, IonTextarea, IonCol } from '@ionic/react';
@@ -6,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from './LoadingSpinner';
-
 import Drawer from './Drawer';
 import './styles.css';
 
@@ -29,15 +29,11 @@ interface FormState {
     pnf_id: number;
     description: string;
 }
-
-const EditarLibro: React.FC = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const VerLibro: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [isNetworkErrorModalOpen, setIsNetworkErrorModalOpen] = useState(false);
-    const [formErrors, setFormErrors] = useState({});
-    const [bookTypes, setBookTypes] = useState<BookType[]>([]);
-    const [pnfs, setPnfs] = useState<PNF[]>([]);
     const [form, setForm] = useState<FormState>({
         name: '',
         publication_year: '',
@@ -47,19 +43,20 @@ const EditarLibro: React.FC = () => {
         pnf_id: 0,
         description: '',
     });
+    const [bookTypes, setBookTypes] = useState<BookType[]>([]);
+    const [pnfs, setPnfs] = useState<PNF[]>([]);
 
     const history = useHistory();
-    const { id } = useParams<{ id: string }>(); // ID del libro a editar
+    const { id } = useParams<{ id: string }>(); // ID del libro a visualizar
+
     useEffect(() => {
         fetchData();
     }, [id]);
 
-
     const fetchData = async () => {
-        setIsLoading(true)
+        setIsLoading(true);
         try {
             // Fetch book types
-
             const bookTypesResponse = await axios.get<BookType[]>('https://library-0a07.onrender.com/book_type/');
             setBookTypes(bookTypesResponse.data);
 
@@ -67,71 +64,16 @@ const EditarLibro: React.FC = () => {
             const pnfsResponse = await axios.get<PNF[]>('https://library-0a07.onrender.com/pnf/');
             setPnfs(pnfsResponse.data);
 
-            // Fetch book details for editing
+            // Fetch book details for viewing
             const bookResponse = await axios.get<FormState>(`https://library-0a07.onrender.com/book/${id}/`);
             setForm(bookResponse.data);
 
-            setIsLoading(false)
+            setIsLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
-            setIsLoading(false)
+            setIsLoading(false);
             setIsNetworkErrorModalOpen(true);
-
         }
-    };
-
-
-    const handleChange = (e: CustomEvent) => {
-        const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-        const { name, value } = target;
-
-        // Convert number inputs to numbers
-        const newValue = name === 'book_type_id' || name === 'pnf_id' ? Number(value) : value;
-
-        setForm(prevForm => ({
-            ...prevForm,
-            [name]: newValue,
-        }));
-    };
-
-    const handleSubmit = async (e:React.FormEvent) => {
-        e.preventDefault();
-        // Verifica que todos los campos estén llenos
-        const errors = {};
-        if (!form.name) errors.name = 'Este campo es obligatorio';
-        if (!form.publication_year) errors.publication_year = 'Este campo es obligatorio';
-        if (!form.author) errors.author = 'Este campo es obligatorio';
-        if (!form.download_url) errors.download_url = 'Este campo es obligatorio';
-        if (!form.book_type_id) errors.book_type_id = 'Este campo es obligatorio';
-        if (!form.pnf_id) errors.pnf_id = 'Este campo es obligatorio';
-        if (!form.description) errors.description = 'Este campo es obligatorio';
-
-        if (Object.keys(errors).length > 0) {
-            setFormErrors(errors);
-            return;
-        }
-        setIsLoading(true)
-
-        try {
-            const response = await axios.put(`https://library-0a07.onrender.com/book/${id}/`, form);
-            if (response.data) {
-                setIsModalOpen(true); // Abre el modal si la respuesta es exitosa
-            } else {
-                console.error('Error updating the book');
-                setIsErrorModalOpen(true)
-            }
-        } catch (error) {
-            console.error('Error in the request:', error);
-            setIsErrorModalOpen(true)
-        } finally {
-            setIsLoading(false); // Oculta el spinner
-        }
-    };
-
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-        history.push('/libros'); // Redirige a la página de libros
-        window.location.reload()
     };
 
     const handleNetworkErrorClose = () => setIsNetworkErrorModalOpen(false);
@@ -140,11 +82,16 @@ const EditarLibro: React.FC = () => {
         setIsNetworkErrorModalOpen(false); // Close the error modal
         await fetchData(); // Retry fetching data
     };
-    
 
     const handleCancel = () => {
         setIsNetworkErrorModalOpen(false); // Just close the modal
     };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        history.push('/libros'); // Redirige a la página de libros
+    };
+
     return (
         <>
             <Drawer />
@@ -162,7 +109,7 @@ const EditarLibro: React.FC = () => {
                         className="boton-volver"
                         shape="round"
                         color="medium"
-                        onClick={() => setFormErrors({})}
+                        
                     >
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />
                         <div className="text-font" style={{ textTransform: 'capitalize' }}>
@@ -172,26 +119,25 @@ const EditarLibro: React.FC = () => {
                 </Link>
                 <div className='scroll-container'>
                     {isLoading ? (
-                        // <p>Cargando ...</p>
                         <LoadingSpinner />
                     ) : (
                         <div className="text-font card-datos-usuario">
                             <IonCard className='carddos-datos-usuario'>
                                 <IonCardContent>
-                                    <form onSubmit={handleSubmit}>
+                                    <form>
                                         <IonRow>
                                             <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Nombre del Libro</span>
                                                     <IonInput
                                                         type="text"
-                                                        className={`text-font inputs-datos-usuario ${formErrors.name ? 'error-input' : ''}`}
+                                                        className="text-font inputs-datos-usuario"
                                                         placeholder="Nombre del Libro"
                                                         name="name"
                                                         value={form.name}
-                                                        onIonChange={handleChange}
+                                                        disabled
+                                                     
                                                     />
-                                                    {formErrors.name && <div className="error-message">{formErrors.name}</div>}
                                                 </div>
                                             </IonCol>
                                             <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
@@ -199,13 +145,13 @@ const EditarLibro: React.FC = () => {
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Año de publicación</span>
                                                     <IonInput
                                                         type="number"
-                                                        className={`text-font inputs-datos-usuario ${formErrors.publication_year ? 'error-input' : ''}`}
+                                                        className="text-font inputs-datos-usuario"
                                                         name="publication_year"
                                                         placeholder="Año de publicación"
                                                         value={form.publication_year}
-                                                        onIonChange={handleChange}
+                                                        disabled
+                                                      
                                                     />
-                                                    {formErrors.publication_year && <div className="error-message">{formErrors.publication_year}</div>}
                                                 </div>
                                             </IonCol>
                                             <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
@@ -213,13 +159,13 @@ const EditarLibro: React.FC = () => {
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Autor</span>
                                                     <IonInput
                                                         type="text"
-                                                        className={`text-font inputs-datos-usuario ${formErrors.author ? 'error-input' : ''}`}
+                                                        className="text-font inputs-datos-usuario"
                                                         placeholder="Autor"
                                                         name="author"
                                                         value={form.author}
-                                                        onIonChange={handleChange}
+                                                        disabled
+                                                     
                                                     />
-                                                    {formErrors.author && <div className="error-message">{formErrors.author}</div>}
                                                 </div>
                                             </IonCol>
                                             <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
@@ -227,75 +173,73 @@ const EditarLibro: React.FC = () => {
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Adjuntar libro</span>
                                                     <IonInput
                                                         type="text"
-                                                        className={`text-font inputs-datos-usuario ${formErrors.download_url ? 'error-input' : ''}`}
+                                                        className="text-font inputs-datos-usuario"
                                                         placeholder="Adjuntar archivo"
                                                         name="download_url"
                                                         value={form.download_url}
-                                                        onIonChange={handleChange}
+                                                        disabled
+                                                     
                                                     />
-                                                    {formErrors.download_url && <div className="error-message">{formErrors.download_url}</div>}
                                                 </div>
                                             </IonCol>
                                             <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Tipo</span>
                                                     <IonSelect
-                                                        className={`text-font ${formErrors.book_type_id ? 'error-input' : ''}`}
+                                                        className="text-font inputs-datos-usuario"
                                                         name="book_type_id"
                                                         placeholder="Seleccionar tipo de libro"
-                                                        style={{ textAlign: 'center', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px', fontSize: '13px' }}
+                                                        style={{ textAlign: 'center', width: '100%', backgroundColor: '#f0f0f0', color: '#000', fontSize: '13px' }} // Estilos para mejorar la visibilidad
                                                         value={form.book_type_id}
-                                                        onIonChange={handleChange}
+                                                        disabled
                                                         mode="ios"
                                                     >
                                                         {bookTypes.map(type => (
                                                             <IonSelectOption className="text-font" key={type.id} value={type.id}>{type.name}</IonSelectOption>
                                                         ))}
                                                     </IonSelect>
-                                                    {formErrors.book_type_id && <div className="error-message">{formErrors.book_type_id}</div>}
                                                 </div>
                                             </IonCol>
                                             <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                                                 <div style={{ textAlign: 'center' }}>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>PNF</span>
                                                     <IonSelect
-                                                        className={`text-font ${formErrors.pnf_id ? 'error-input' : ''}`}
-                                                        style={{ textAlign: 'center', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px', fontSize: '13px' }}
+                                                        className="text-font inputs-datos-usuario"
+                                                        style={{ textAlign: 'center', width: '100%', backgroundColor: '#f0f0f0', color: '#000', fontSize: '13px' }} // Estilos para mejorar la visibilidad
                                                         name="pnf_id"
                                                         placeholder="Selecciona el PNF"
                                                         value={form.pnf_id}
-                                                        onIonChange={handleChange}
+                                                        disabled
                                                         mode="ios"
                                                     >
                                                         {pnfs.map(pnf => (
                                                             <IonSelectOption style={{ fontSize: '13px' }} className="text-font" key={pnf.id} value={pnf.id}>{pnf.name}</IonSelectOption>
                                                         ))}
                                                     </IonSelect>
-                                                    {formErrors.pnf_id && <div className="error-message">{formErrors.pnf_id}</div>}
                                                 </div>
                                             </IonCol>
                                             <IonCol size='12'>
                                                 <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Descripción o reseña</span>
                                                 <div>
                                                     <IonTextarea
-                                                        className={`text-font inputs-datos-usuario ${formErrors.description ? 'error-input' : ''}`}
+                                                        className="text-font inputs-datos-usuario"
                                                         placeholder="Reseña o sinopsis del libro"
                                                         name="description"
                                                         value={form.description}
-                                                        onIonChange={handleChange}
+                                                        disabled
+                                                       
                                                     />
-                                                    {formErrors.description && <div className="error-message">{formErrors.description}</div>}
                                                 </div>
                                             </IonCol>
                                         </IonRow>
                                         <div style={{ textAlign: 'center' }}>
                                             <IonButton
                                                 color="secondary"
-                                                type="submit"
+                                                onClick={handleModalClose}
                                                 style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }}
                                                 className="text-font"
                                             >
-                                                Actualizar
+                                                Cerrar
                                             </IonButton>
                                         </div>
                                     </form>
@@ -313,7 +257,7 @@ const EditarLibro: React.FC = () => {
                     className='text-font'
                     isOpen={isModalOpen}
                     header="Éxito"
-                    message="Su libro ha sido añadido con éxito."
+                    message="Los detalles del libro se han mostrado correctamente."
                     buttons={[{
                         text: 'Aceptar',
                         handler: handleModalClose
@@ -325,7 +269,7 @@ const EditarLibro: React.FC = () => {
                     className='text-font'
                     isOpen={isErrorModalOpen}
                     header="Error"
-                    message="No se pudo actualizar el libro. Por favor, intente de nuevo más tarde."
+                    message="No se pudo cargar la información del libro. Por favor, intente de nuevo más tarde."
                     buttons={[{
                         text: 'Aceptar',
                         handler: () => setIsErrorModalOpen(false)
@@ -357,4 +301,4 @@ const EditarLibro: React.FC = () => {
     );
 };
 
-export default EditarLibro;
+export default VerLibro
