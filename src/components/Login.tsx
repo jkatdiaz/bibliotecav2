@@ -42,36 +42,38 @@ const Login: React.FC<LoginProps> = () => {
 
   return (
     <IonPage>
-      <div className="text-font" style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(208, 228, 243)' }}>
-        <IonCard className="text-font" style={{ position: 'relative', borderRadius: '20px', flexDirection: 'column', padding: '20px', backgroundColor: 'rgba(255, 255, 255, 0.67)' }}>
+      <div className="text-font card-login" >
+        <IonCard className="text-font card2-login" >
           <IonCardContent className="text-font">
             <div style={{ textAlign: 'center', paddingBottom: '15px' }}>
               <img style={{ width: '80px', height: '80px', borderRadius: '50%', boxShadow: '0px 0px 9px 6px rgba(116, 127, 135, 0.59)', backgroundColor: 'rgb(73, 103, 155)' }} alt="Silhouette of mountains" src={iconIut} />
             </div>
             <form onSubmit={handleSubmit}>
-              <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.18)', marginBottom: '12px', borderRadius: '5px', padding: '8px' }}>
+              <div style={{marginBottom:'12px'}}>
+              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px', display:'flex', justifyContent:'center' }}>Usuario o Correo</span>
                 <IonInput
-                  className="text-font"
+                 className={`text-font inputs-datos-usuario ${emailError ? 'error-input' : ''}`}
                   value={email}
                   onIonInput={(e: any) => setEmail(e.target.value)}
                   placeholder="Usuario / Correo"
                   style={{ textAlign: 'center', fontSize: '16px', padding: '8px', border: 'none', background: 'transparent', width: '100%' }}
                 ></IonInput>
-                {emailError && <IonText color="danger"><p>{emailError}</p></IonText>}
+                 {emailError &&  <div className="error-message">{emailError}</div>}
               </div>
-              <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px' }}>
+              <div >
+              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px', display:'flex', justifyContent:'center' }}>Contraseña</span>
                 <IonInput
-                  className="text-font"
+                  className={`text-font inputs-datos-usuario ${passwordError ? 'error-input' : ''}`}
                   value={password}
                   onIonInput={(e: any) => setPassword(e.target.value)}
                   placeholder="Contraseña"
                   type="password"
                   style={{ textAlign: 'center', fontSize: '16px', padding: '8px', border: 'none', background: 'transparent', width: '100%' }}
                 ></IonInput>
-                {passwordError && <IonText color="danger"><p>{passwordError}</p></IonText>}
+                {passwordError && <div className="error-message">{passwordError}</div>}
               </div>
               <div className="text-font" style={{ textAlign: 'center', marginTop: '20px' }}>
-                <IonButton color="secondary" type="submit" style={{borderRadius: '10px',textTransform:"capitalize" }} className="text-font">Iniciar Sesión</IonButton>
+                <IonButton color="secondary" type="submit" style={{borderRadius: '10px',textTransform:"capitalize", fontSize:'13px' }} className="text-font">Iniciar Sesión</IonButton>
               </div>
             </form>
             <div className="text-font" style={{ textAlign: 'center', marginTop: '20px' }}>

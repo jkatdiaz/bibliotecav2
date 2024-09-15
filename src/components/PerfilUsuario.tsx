@@ -43,11 +43,12 @@ const PerfilUsuario: React.FC = () => {
            
                 <div className="text-font card-datos-usuario" >
                     <IonCard className='carddos-datos-usuario'>
-                        <IonCardContent>
-                           <IonCardTitle className="text-font" style={{ textAlign: 'center', marginBottom: "40px", fontSize: "19px" }}>Perfil del Usuario</IonCardTitle> 
+                        <IonCardContent style={{paddingBottom:'0px'}}>
+                           <IonCardTitle className="text-font" style={{ textAlign: 'center', marginBottom: "10px", fontSize: "19px" }}>Perfil del Usuario</IonCardTitle> 
                             <form >
                                 <IonRow>
                                 <IonCol size='6'>
+                                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Nombre</span>
                                     <div style={{ marginBottom: '12px' }}>
                                         <IonInput
                                             className="text-font inputs-datos-usuario"
@@ -60,6 +61,7 @@ const PerfilUsuario: React.FC = () => {
 
                                 </IonCol>
                                 <IonCol size='6'>
+                                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Apellido</span>
                                     <div style={{ marginBottom: '12px' }}>
                                         <IonInput
                                             className="text-font inputs-datos-usuario"
@@ -71,6 +73,7 @@ const PerfilUsuario: React.FC = () => {
 
                                 </IonCol>
                                 <IonCol size='6'>
+                                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Correo</span>
                                     <div style={{ marginBottom: '12px' }}>
                                         <IonInput
                                             className="text-font inputs-datos-usuario"
@@ -83,6 +86,7 @@ const PerfilUsuario: React.FC = () => {
 
                                 </IonCol>
                                 <IonCol size='6'>
+                                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>PNF</span>
                                     <div style={{ marginBottom: '12px' }}>
                                         <IonInput
                                             className="text-font inputs-datos-usuario"
@@ -95,6 +99,7 @@ const PerfilUsuario: React.FC = () => {
 
                                 </IonCol>
                                 <IonCol size='6'>
+                                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Trayecto</span>
                                     <div style={{ marginBottom: '12px' }}>
                                         <IonInput
                                             className="text-font inputs-datos-usuario"
@@ -107,6 +112,7 @@ const PerfilUsuario: React.FC = () => {
 
                                 </IonCol>
                                 <IonCol size='6'>
+                                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Rol</span>
                                     <div style={{ marginBottom: '12px' }}>
                                         <IonInput
                                             className="text-font inputs-datos-usuario"

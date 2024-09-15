@@ -8,11 +8,13 @@ const Register: React.FC = () => {
   const [lastName, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [pnf, setPnf] = useState<string>('');
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [firstNameError, setFirstNameError] = useState<string | null>(null);
   const [lastNameError, setLastNameError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [pnfError, setPnfError] = useState<string | null>(null);
 
   // Maneja el envío del formulario
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,6 +25,7 @@ const Register: React.FC = () => {
     setLastNameError(null);
     setEmailError(null);
     setPasswordError(null);
+    setPnfError(null)
 
     // Validación simple
     let hasError = false;
@@ -42,6 +45,10 @@ const Register: React.FC = () => {
       setPasswordError('La contraseña es obligatoria.');
       hasError = true;
     }
+    if (!pnf) {
+      setPnfError('Seleccione el PNF');
+      hasError = true;
+    }
 
     // Si no hay errores, puedes proceder con la lógica de registro
     if (!hasError) {
@@ -58,53 +65,55 @@ const Register: React.FC = () => {
             <IonCardTitle className="text-font"   style={{ textAlign: 'center', marginBottom:"40px", fontSize:"19px" }}>Ingresa tus datos personales</IonCardTitle>
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '12px' }}>
+              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Nombre</span>
                 <IonInput
-                className="text-font"
+                 className={`text-font inputs-datos-usuario ${firstNameError ? 'error-input' : ''}`}
+                
                   value={firstName}
                   onIonInput={(e: any) => setFirstName(e.target.value)}
                   placeholder="Nombre"
-                  style={{ textAlign: 'center', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px' }}
+                 
                 ></IonInput>
-                {firstNameError && <IonText color="danger"><p>{firstNameError}</p></IonText>}
+                {firstNameError && <div className="error-message">{firstNameError}</div>}
               </div>
               <div style={{ marginBottom: '12px' }}>
+              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px'}}>Apellido</span>
                 <IonInput
-                className="text-font"
+              className={`text-font inputs-datos-usuario ${lastNameError ? 'error-input' : ''}`}
                   value={lastName}
                   onIonInput={(e: any) => setLastName(e.target.value)}
                   placeholder="Apellido"
-                  style={{ textAlign: 'center', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px' }}
                 ></IonInput>
-                {lastNameError && <IonText color="danger"><p>{lastNameError}</p></IonText>}
+                {lastNameError && <div className="error-message">{lastNameError}</div>}
               </div>
               <div style={{ marginBottom: '12px' }}>
+              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Correo</span>
                 <IonInput
-                className="text-font"
+                className={`text-font inputs-datos-usuario ${emailError ? 'error-input' : ''}`}
                   value={email}
                   onIonInput={(e: any) => setEmail(e.target.value)}
                   placeholder="Correo"
-                  style={{ textAlign: 'center', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px' }}
                 ></IonInput>
-                {emailError && <IonText color="danger"><p>{emailError}</p></IonText>}
+                {emailError &&  <div className="error-message">{emailError}</div>}
               </div>
               <div style={{ marginBottom: '12px' }}>
+              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Contraseña</span>
                 <IonInput
-                className="text-font"
+               className={`text-font inputs-datos-usuario ${passwordError ? 'error-input' : ''}`}
                   value={password}
                   onIonInput={(e: any) => setPassword(e.target.value)}
                   placeholder="Contraseña"
                   type="password"
-                  style={{  textAlign: 'center',width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px' }}
                 ></IonInput>
-                {passwordError && <IonText color="danger"><p>{passwordError}</p></IonText>}
+                {passwordError && <div className="error-message">{passwordError}</div>}
               </div>
               <div style={{ marginBottom: '12px' }}>
+              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>PNF</span>
                 <IonSelect
-                className="text-font"
+                 className={`text-font inputs-datos-usuario ${pnfError ? 'error-input' : ''}`}
                   value={selectedOption}
                   onIonChange={(e: any) => setSelectedOption(e.detail.value)}
                   placeholder="Selecciona una opción"
-                  style={{ textAlign: 'center', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px' }}
                 >
                   <IonSelectOption value="option1">Opción 1</IonSelectOption>
                   <IonSelectOption value="option2">Opción 2</IonSelectOption>
@@ -112,9 +121,10 @@ const Register: React.FC = () => {
                   <IonSelectOption value="option4">Opción 4</IonSelectOption>
                   <IonSelectOption value="option5">Opción 5</IonSelectOption>
                 </IonSelect>
+                {pnfError && <div className="error-message">{pnfError}</div>}
               </div>
               <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                <IonButton color="secondary" type="submit" style={{borderRadius: '10px',textTransform:"capitalize" }} className="text-font">Registrarse</IonButton>
+                <IonButton color="secondary" type="submit" style={{borderRadius: '10px',textTransform:"capitalize", fontSize:'13px' }} className="text-font">Registrarse</IonButton>
               </div>
             </form>
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
