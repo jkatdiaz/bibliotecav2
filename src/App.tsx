@@ -18,6 +18,9 @@ import EditarLibro from './components/EditarLibro';
 import VerLibro from './components/VerLibro';
 
 
+
+
+
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -51,6 +54,7 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => (
+  
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
@@ -78,6 +82,7 @@ const App: React.FC = () => (
 
       </IonRouterOutlet>
     </IonReactRouter>
+
   </IonApp>
 );
 

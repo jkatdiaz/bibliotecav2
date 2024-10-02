@@ -22,12 +22,13 @@ interface PNF {
 
 interface FormState {
     name: string;
+    book_type: string;
     publication_year: string;
     author: string;
     download_url: string;
-    book_type_id: number;
     pnf_id: number;
     description: string;
+    user_id: number
 }
 const VerLibro: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -36,12 +37,13 @@ const VerLibro: React.FC = () => {
     const [isNetworkErrorModalOpen, setIsNetworkErrorModalOpen] = useState(false);
     const [form, setForm] = useState<FormState>({
         name: '',
+        book_type: '',
         publication_year: '',
         author: '',
         download_url: '',
-        book_type_id: 0,
         pnf_id: 0,
         description: '',
+        user_id: 0
     });
     const [bookTypes, setBookTypes] = useState<BookType[]>([]);
     const [pnfs, setPnfs] = useState<PNF[]>([]);
@@ -59,6 +61,7 @@ const VerLibro: React.FC = () => {
             // Fetch book types
             const bookTypesResponse = await axios.get<BookType[]>('https://library-0a07.onrender.com/book_type/');
             setBookTypes(bookTypesResponse.data);
+            
 
             // Fetch PNFs
             const pnfsResponse = await axios.get<PNF[]>('https://library-0a07.onrender.com/pnf/');
@@ -67,6 +70,10 @@ const VerLibro: React.FC = () => {
             // Fetch book details for viewing
             const bookResponse = await axios.get<FormState>(`https://library-0a07.onrender.com/book/${id}/`);
             setForm(bookResponse.data);
+            console.log(form)
+            console.log(bookTypes, "aqui")
+            console.log('selected value:', form.book_type);
+
 
             setIsLoading(false);
         } catch (error) {
@@ -109,7 +116,7 @@ const VerLibro: React.FC = () => {
                         className="boton-volver"
                         shape="round"
                         color="medium"
-                        
+
                     >
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />
                         <div className="text-font" style={{ textTransform: 'capitalize' }}>
@@ -136,7 +143,8 @@ const VerLibro: React.FC = () => {
                                                         name="name"
                                                         value={form.name}
                                                         disabled
-                                                     
+                                                        style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
+
                                                     />
                                                 </div>
                                             </IonCol>
@@ -149,8 +157,8 @@ const VerLibro: React.FC = () => {
                                                         name="publication_year"
                                                         placeholder="Año de publicación"
                                                         value={form.publication_year}
-                                                        disabled
-                                                      
+                                                        style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
+
                                                     />
                                                 </div>
                                             </IonCol>
@@ -164,7 +172,8 @@ const VerLibro: React.FC = () => {
                                                         name="author"
                                                         value={form.author}
                                                         disabled
-                                                     
+                                                        style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
+
                                                     />
                                                 </div>
                                             </IonCol>
@@ -178,25 +187,30 @@ const VerLibro: React.FC = () => {
                                                         name="download_url"
                                                         value={form.download_url}
                                                         disabled
-                                                     
+                                                        style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
+
                                                     />
                                                 </div>
                                             </IonCol>
                                             <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Tipo</span>
+                                                
                                                     <IonSelect
                                                         className="text-font inputs-datos-usuario"
-                                                        name="book_type_id"
+                                                        name="book_type"
                                                         placeholder="Seleccionar tipo de libro"
-                                                        style={{ textAlign: 'center', width: '100%', backgroundColor: '#f0f0f0', color: '#000', fontSize: '13px' }} // Estilos para mejorar la visibilidad
-                                                        value={form.book_type_id}
+                                                        style={{ textAlign: 'center', width: '100%', backgroundColor: '#f0f0f0', color: '#000', fontSize: '13px', opacity: 1, cursor: 'not-allowed' }} // Estilos para mejorar la visibilidad
+                                                        value={form.book_type}
                                                         disabled
+
                                                         mode="ios"
                                                     >
                                                         {bookTypes.map(type => (
+
                                                             <IonSelectOption className="text-font" key={type.id} value={type.id}>{type.name}</IonSelectOption>
                                                         ))}
+
                                                     </IonSelect>
                                                 </div>
                                             </IonCol>
@@ -205,11 +219,12 @@ const VerLibro: React.FC = () => {
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>PNF</span>
                                                     <IonSelect
                                                         className="text-font inputs-datos-usuario"
-                                                        style={{ textAlign: 'center', width: '100%', backgroundColor: '#f0f0f0', color: '#000', fontSize: '13px' }} // Estilos para mejorar la visibilidad
+                                                        style={{ textAlign: 'center', width: '100%', backgroundColor: '#f0f0f0', color: '#000', fontSize: '13px', opacity: 1, cursor: 'not-allowed' }} // Estilos para mejorar la visibilidad
                                                         name="pnf_id"
                                                         placeholder="Selecciona el PNF"
                                                         value={form.pnf_id}
                                                         disabled
+
                                                         mode="ios"
                                                     >
                                                         {pnfs.map(pnf => (
@@ -227,7 +242,8 @@ const VerLibro: React.FC = () => {
                                                         name="description"
                                                         value={form.description}
                                                         disabled
-                                                       
+                                                        style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
+
                                                     />
                                                 </div>
                                             </IonCol>

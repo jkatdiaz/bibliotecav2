@@ -35,7 +35,7 @@ const EditarLibro: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [isNetworkErrorModalOpen, setIsNetworkErrorModalOpen] = useState(false);
-    const [formErrors, setFormErrors] = useState({});
+    const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
     const [bookTypes, setBookTypes] = useState<BookType[]>([]);
     const [pnfs, setPnfs] = useState<PNF[]>([]);
     const [form, setForm] = useState<FormState>({
@@ -97,7 +97,7 @@ const EditarLibro: React.FC = () => {
     const handleSubmit = async (e:React.FormEvent) => {
         e.preventDefault();
         // Verifica que todos los campos estén llenos
-        const errors = {};
+        const errors: { [key: string]: string } = {};
         if (!form.name) errors.name = 'Este campo es obligatorio';
         if (!form.publication_year) errors.publication_year = 'Este campo es obligatorio';
         if (!form.author) errors.author = 'Este campo es obligatorio';

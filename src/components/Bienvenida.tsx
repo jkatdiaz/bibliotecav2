@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Storage } from '@ionic/storage';
 import {
     IonHeader,
     IonPage,
@@ -14,12 +15,28 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 import bienvenida from './../images/fondoss-removebg-preview.png'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+
 
 import Drawer from './Drawer';
 import './styles.css';
 
-const Bienvenida: React.FC<{ username: string }> = ({ username }) => {
+interface UserData {
+    id: number;
+    first_name: string;
+  }
+const Bienvenida: React.FC = () => {
+    const [userData, setUserData] = useState<UserData | null>(null);
+
+    useEffect(() => {
+        const storedData = localStorage.getItem('userData');
+        if (storedData) {
+          setUserData(JSON.parse(storedData));
+        } else {
+          // Opcional: redirigir o mostrar un mensaje
+          console.log("No se encontraron datos de usuario.");
+        }
+      }, []);
     return (
         <>
             <Drawer />
@@ -32,10 +49,10 @@ const Bienvenida: React.FC<{ username: string }> = ({ username }) => {
                         <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
                     </IonToolbar>
                 </IonHeader>
-               
+
                 <div className="welcome-container">
                     <div className="welcome-content">
-                        <h1 className='bienvenida'>Hola Bienvenido, {username}!</h1>
+                        <h1 className='bienvenida'>Hola Bienvenido, {userData ? userData.first_name : 'invitado'}!</h1>
 
                         <img src={bienvenida} alt="Imagen de bienvenida" className="welcome-image" />
 
@@ -48,7 +65,7 @@ const Bienvenida: React.FC<{ username: string }> = ({ username }) => {
 
                                 </IonCard>
                             </Link>
-                            
+
                             <Link to="/menu" className="no-underline">
                                 <IonCard className="clickable-card card">
                                     <IonCardHeader>

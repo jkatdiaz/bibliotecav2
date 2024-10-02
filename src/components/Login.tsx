@@ -1,44 +1,69 @@
 
 import React, { useState } from 'react';
-import { IonCard, IonCardContent, IonInput, IonButton, IonPage, IonText } from '@ionic/react';
+import axios from 'axios';
+import { IonCard, IonCardContent, IonInput, IonButton, IonPage, IonText, IonAlert} from '@ionic/react';
 import { Link } from 'react-router-dom';
 import iconIut from '../images/logoIut.png';
 import './Login.css';
+import LoadingSpinner from './LoadingSpinner';
 
-interface LoginProps {}
+interface LoginProps { }
+
+interface FormState {
+  email: string;
+  password: string;
+}
 
 const Login: React.FC<LoginProps> = () => {
-  // Define estados para los campos y mensajes de error
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  // Maneja el envío del formulario
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+  const [form, setForm] = useState<FormState>({
+    email: '',
+    password: '',
+  });
+  const [errors, setErrors] = useState<{ email: string | null; password: string | null }>({
+    email: null,
+    password: null,
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({ email: null, password: null });
 
-    // Resetear mensajes de error
-    setEmailError(null);
-    setPasswordError(null);
-
-    // Validación simple
     let hasError = false;
-    if (!email) {
-      setEmailError('El correo es obligatorio.');
+    if (!form.email) {
+      setErrors((prev) => ({ ...prev, email: 'El correo es obligatorio.' }));
       hasError = true;
     }
-    if (!password) {
-      setPasswordError('La contraseña es obligatoria.');
+    if (!form.password) {
+      setErrors((prev) => ({ ...prev, password: 'La contraseña es obligatoria.' }));
       hasError = true;
     }
 
-    // Si no hay errores, puedes proceder con la lógica de inicio de sesión
     if (!hasError) {
-      // Lógica de inicio de sesión aquí
-      console.log('Iniciando sesión con', email, password);
+      setIsLoading(true)
+      try {
+        const response = await axios.post('https://library-0a07.onrender.com/user/login', form);
+
+        const { user } = response.data;
+        console.log(response.data, "aqui respuesta")
+        localStorage.setItem('userData', JSON.stringify({ id: user.id, first_name: user.first_name }));
+        window.location.href = '/bienvenida';
+      } catch (error) {
+        console.error('Error en el inicio de sesión', error);
+        setIsErrorModalOpen(true);
+      } finally {
+        setIsLoading(false); // Ocultar el spinner
+      }
     }
   };
+
 
   return (
     <IonPage>
@@ -49,40 +74,66 @@ const Login: React.FC<LoginProps> = () => {
               <img style={{ width: '80px', height: '80px', borderRadius: '50%', boxShadow: '0px 0px 9px 6px rgba(116, 127, 135, 0.59)', backgroundColor: 'rgb(73, 103, 155)' }} alt="Silhouette of mountains" src={iconIut} />
             </div>
             <form onSubmit={handleSubmit}>
-              <div style={{marginBottom:'12px'}}>
-              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px', display:'flex', justifyContent:'center' }}>Usuario o Correo</span>
+              <div style={{ marginBottom: '12px' }}>
+                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px', display: 'flex', justifyContent: 'center' }}>Usuario o Correo</span>
                 <IonInput
-                 className={`text-font inputs-datos-usuario ${emailError ? 'error-input' : ''}`}
-                  value={email}
-                  onIonInput={(e: any) => setEmail(e.target.value)}
+                  className={`text-font inputs-datos-usuario ${errors.email ? 'error-input' : ''}`}
+                  name="email"
+                  value={form.email}
+                  onIonInput={handleInputChange}
                   placeholder="Usuario / Correo"
+
                   style={{ textAlign: 'center', fontSize: '16px', padding: '8px', border: 'none', background: 'transparent', width: '100%' }}
                 ></IonInput>
-                 {emailError &&  <div className="error-message">{emailError}</div>}
+                {errors.email && <div className="error-message">{errors.email}</div>}
               </div>
               <div >
-              <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px', display:'flex', justifyContent:'center' }}>Contraseña</span>
+                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px', display: 'flex', justifyContent: 'center' }}>Contraseña</span>
                 <IonInput
-                  className={`text-font inputs-datos-usuario ${passwordError ? 'error-input' : ''}`}
-                  value={password}
-                  onIonInput={(e: any) => setPassword(e.target.value)}
+                  className={`text-font inputs-datos-usuario ${form.password ? 'error-input' : ''}`}
+                  name="password"
+                  value={form.password}
+                  onIonInput={handleInputChange}
                   placeholder="Contraseña"
                   type="password"
                   style={{ textAlign: 'center', fontSize: '16px', padding: '8px', border: 'none', background: 'transparent', width: '100%' }}
                 ></IonInput>
-                {passwordError && <div className="error-message">{passwordError}</div>}
+                {errors.password && <div className="error-message">{errors.password}</div>}
               </div>
               <div className="text-font" style={{ textAlign: 'center', marginTop: '20px' }}>
-                <IonButton color="secondary" type="submit" style={{borderRadius: '10px',textTransform:"capitalize", fontSize:'13px' }} className="text-font">Iniciar Sesión</IonButton>
+                <Link to="/bienvenida">
+                  <IonButton color="secondary" type="submit" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }} className="text-font">Iniciar Sesión</IonButton>
+                </Link>
+
               </div>
             </form>
             <div className="text-font" style={{ textAlign: 'center', marginTop: '20px' }}>
               <Link to="/register">
-                <IonButton size="small" color="medium" className="text-font" style={{borderRadius: '10px',textTransform:"capitalize", fontSize:"9px" }}>¿Eres nuevo? ¡Registrate!</IonButton>
+                <IonButton size="small" color="medium" className="text-font" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: "9px" }}>¿Eres nuevo? ¡Registrate!</IonButton>
               </Link>
             </div>
+           
           </IonCardContent>
+          
         </IonCard>
+        {isLoading && (
+              <div className="spinner-overlay">
+                <LoadingSpinner />
+              </div>
+            )}
+
+            <IonAlert
+              className='text-font'
+              isOpen={isErrorModalOpen}
+              header="Error"
+              message="No se pudo iniciar sesión. Por favor, intente de nuevo más tarde."
+              buttons={[{
+                text: 'Aceptar',
+                handler: () => setIsErrorModalOpen(false),
+              }]}
+              onDidDismiss={() => setIsErrorModalOpen(false)}
+              mode="ios"
+            />
       </div>
     </IonPage>
   );

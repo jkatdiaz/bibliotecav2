@@ -35,7 +35,7 @@ const SubirLibro: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-    const [formErrors, setFormErrors] = useState({});
+    const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
     
 
     const history = useHistory();
@@ -63,6 +63,7 @@ const SubirLibro: React.FC = () => {
             .then(response => setPnfs(response.data))
             .catch(error => console.error('Error fetching PNFs:', error));
     }, []);
+    
     const handleChange = (e: CustomEvent) => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
         const { name, value } = target;
@@ -79,7 +80,7 @@ const SubirLibro: React.FC = () => {
     const handleSubmit = async (e:React.FormEvent) => {
         e.preventDefault();
         // Verifica que todos los campos estén llenos
-        const errors = {};
+        const errors: { [key: string]: string } = {};
         if (!form.name) errors.name = 'Este campo es obligatorio';
         if (!form.publication_year) errors.publication_year = 'Este campo es obligatorio';
         if (!form.author) errors.author = 'Este campo es obligatorio';

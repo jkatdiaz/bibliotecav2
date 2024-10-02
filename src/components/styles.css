@@ -213,7 +213,12 @@ ion-menu::part(container) {
    font-size: 13px !important;
 
 }
-
+.inputs-datos-usuario:disabled {
+  background-color: white !important; /* Color de fondo */
+  color: black  !important; /* Color del texto */
+  opacity: 1  !important; /* Asegúrate de que no esté más claro */
+  cursor: not-allowed  !important; /* Opcional: cambiar el cursor */
+}
 .carddos-datos-usuario {
   border-radius: 20px;
 
