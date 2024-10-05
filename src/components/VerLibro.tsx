@@ -28,7 +28,8 @@ interface FormState {
     download_url: string;
     pnf_id: number;
     description: string;
-    user_id: number
+    first_name: string, // Nuevo campo
+    last_name: string
 }
 const VerLibro: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +44,8 @@ const VerLibro: React.FC = () => {
         download_url: '',
         pnf_id: 0,
         description: '',
-        user_id: 0
+        first_name: '',
+        last_name: ''
     });
     const [bookTypes, setBookTypes] = useState<BookType[]>([]);
     const [pnfs, setPnfs] = useState<PNF[]>([]);
@@ -54,14 +56,16 @@ const VerLibro: React.FC = () => {
     useEffect(() => {
         fetchData();
     }, [id]);
-
+   
     const fetchData = async () => {
         setIsLoading(true);
         try {
             // Fetch book types
             const bookTypesResponse = await axios.get<BookType[]>('https://library-0a07.onrender.com/book_type/');
             setBookTypes(bookTypesResponse.data);
-            
+
+            console.log('Book Types:', bookTypesResponse.data);
+
 
             // Fetch PNFs
             const pnfsResponse = await axios.get<PNF[]>('https://library-0a07.onrender.com/pnf/');
@@ -74,7 +78,6 @@ const VerLibro: React.FC = () => {
             console.log(bookTypes, "aqui")
             console.log('selected value:', form.book_type);
 
-
             setIsLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -82,6 +85,8 @@ const VerLibro: React.FC = () => {
             setIsNetworkErrorModalOpen(true);
         }
     };
+
+    const fullName = `${form.first_name || "N/A"} ${form.last_name || ""}`;
 
     const handleNetworkErrorClose = () => setIsNetworkErrorModalOpen(false);
 
@@ -113,6 +118,7 @@ const VerLibro: React.FC = () => {
                 </IonHeader>
                 <Link to="/libros" className="no-underline">
                     <IonButton
+
                         className="boton-volver"
                         shape="round"
                         color="medium"
@@ -195,7 +201,7 @@ const VerLibro: React.FC = () => {
                                             <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Tipo</span>
-                                                
+
                                                     <IonSelect
                                                         className="text-font inputs-datos-usuario"
                                                         name="book_type"
@@ -208,7 +214,7 @@ const VerLibro: React.FC = () => {
                                                     >
                                                         {bookTypes.map(type => (
 
-                                                            <IonSelectOption className="text-font" key={type.id} value={type.id}>{type.name}</IonSelectOption>
+                                                            <IonSelectOption className="text-font" key={type.id} value={type.name}>{type.name}</IonSelectOption>
                                                         ))}
 
                                                     </IonSelect>
@@ -241,6 +247,20 @@ const VerLibro: React.FC = () => {
                                                         placeholder="Reseña o sinopsis del libro"
                                                         name="description"
                                                         value={form.description}
+                                                        disabled
+                                                        style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
+
+                                                    />
+                                                </div>
+                                            </IonCol>
+                                            <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
+                                                <div>
+                                                    <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Publicado por: </span>
+                                                    <IonInput
+                                                        type="text"
+                                                        className="text-font inputs-datos-usuario"
+                                                        placeholder="Usuario"
+                                                        value={fullName}
                                                         disabled
                                                         style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
 

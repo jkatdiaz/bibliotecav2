@@ -7,6 +7,7 @@ import { faAnglesLeft, faCirclePlus, faSearch } from '@fortawesome/free-solid-sv
 import { IonContent, IonAlert, IonInput, IonButton, IonButtons, IonMenuButton, IonText, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonCardTitle } from '@ionic/react';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
+import { useLocation } from 'react-router-dom';
 
 import Drawer from './Drawer';
 import './styles.css';
@@ -27,6 +28,8 @@ const Libros: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    const location = useLocation();
+
 
     // const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -34,8 +37,8 @@ const Libros: React.FC = () => {
 
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData(); // Llama a fetchData cada vez que cambia la ubicación
+    }, [location.pathname]); // Se ejecuta cuando la ruta cambia
 
     useEffect(() => {
         filterData();

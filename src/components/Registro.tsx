@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { IonCard, IonCardContent, IonContent,IonAlert, IonCardTitle, IonInput, IonButton, IonPage, IonSelect, IonSelectOption, IonText } from '@ionic/react';
+import { IonCard, IonCardContent, IonContent, IonAlert, IonCardTitle, IonInput, IonButton, IonPage, IonSelect, IonSelectOption, IonText } from '@ionic/react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
 import Bienvenida from './Bienvenida';
 import { useHistory } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+
 
 interface FormState {
   first_name: string;
@@ -27,18 +30,25 @@ const Register: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<FormState>({
     first_name: '',
     last_name: '',
     email: '',
     password: '',
     user_type: '',
-    role_id: 0
+    role_id: 2
   });
 
   // Maneja el cambio de los campos del formulario
+  // const handleChange = (e: CustomEvent) => {
+  //   const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+  //   const { name, value } = target;
+  //   setForm((prevForm) => ({ ...prevForm, [name]: value })); // Actualiza el estado
+  // };
+
   const handleChange = (e: CustomEvent) => {
-    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    const target = e.target as HTMLInputElement;
     const { name, value } = target;
     setForm((prevForm) => ({ ...prevForm, [name]: value })); // Actualiza el estado
   };
@@ -52,7 +62,7 @@ const Register: React.FC = () => {
     if (!form.last_name) errors.last_name = 'Este campo es obligatorio';
     if (!form.email) errors.email = 'Este campo es obligatorio';
     if (!form.password) errors.password = 'Este campo es obligatorio';
-    if (!form.role_id) errors.role_id = 'Seleccione un rol';
+    if (!form.user_type) errors.user_type = 'Seleccione un rol';
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -69,10 +79,11 @@ const Register: React.FC = () => {
       const response = await axios.post('https://library-0a07.onrender.com/user/', form);
 
       if (response.data) {
-        // const { first_name, id } = response.data; // Asegúrate de que estos campos existan en la respuesta
-        const userDataToStore = { first_name: form.first_name }; // Usa el objeto de formulario
-        localStorage.setItem('userData', JSON.stringify(userDataToStore));
-      
+
+        const { user } = response.data
+        localStorage.setItem('userData', JSON.stringify({ id: user.id, first_name: user.first_name }));
+
+
         setIsModalOpen(true); //e el modal si la respuesta es exitosa
       } else {
         console.error('Error al registrarse');
@@ -86,7 +97,12 @@ const Register: React.FC = () => {
     }
   };
   // Maneja el cierre del modal de éxito
-  
+  const togglePasswordVisibility = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Evita que el evento se propague
+    setShowPassword((prev) => !prev);
+  };
+
+
   const handleModalClose = () => {
     setIsModalOpen(false); // Cierra el modal
     history.push({
@@ -140,6 +156,9 @@ const Register: React.FC = () => {
                 ></IonInput>
                 {formErrors.email && <div className="error-message">{formErrors.email}</div>}
               </div>
+
+
+              {/* 
               <div style={{ marginBottom: '12px' }}>
                 <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Contraseña</span>
                 <IonInput
@@ -151,21 +170,65 @@ const Register: React.FC = () => {
                   type="password"
                 ></IonInput>
                 {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+                <IonInput
+                  className={`text-font inputs-datos-usuario ${form.password ? 'error-input' : ''}`}
+                  name="password"
+                  value={form.password}
+                  onIonInput={handleChange}
+                  placeholder="Contraseña"
+                  type={showPassword ? "text" : "password"}
+                  style={{ textAlign: 'center', fontSize: '16px', padding: '8px', border: 'none', background: 'transparent', width: '100%' }}
+                />
+
+                <button
+                  onClick={togglePasswordVisibility}
+                  style={{ zIndex: 1000, position: 'absolute', right: '10px', top: '36%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                  onMouseDown={(e) => e.preventDefault()} // Previene el efecto de enfoque del input
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+                </button>
+                <div style={{ height: '20px', textAlign: 'center' }}>
+                {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+                </div>
+              </div> */}
+
+              <div style={{ position: 'relative', marginBottom: '12px' }}>
+                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Contraseña</span>
+                <IonInput
+                  name="password"
+                  className={`text-font inputs-datos-usuario ${formErrors.password ? 'error-input' : ''}`}
+                  value={form.password}
+                  onIonChange={handleChange}
+                  placeholder="Contraseña"
+                  type={showPassword ? "text" : "password"}
+                  style={{ textAlign: 'center', fontSize: '16px', padding: '8px', border: 'none', background: 'transparent', width: '100%' }}
+                />
+                <button
+                  onClick={togglePasswordVisibility}
+                  style={{ zIndex: 1000, position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                  onMouseDown={(e) => e.preventDefault()}  // Previene el efecto de enfoque del input
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+                </button>
+                <div style={{ height: '20px', textAlign: 'center' }}>
+                  {formErrors.password && <div className="error-message">{formErrors.password}</div>}
+                </div>
               </div>
+
+
               <div style={{ marginBottom: '12px' }}>
                 <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Rol</span>
                 <IonSelect
-                  name="role_id"
-                  className={`text-font inputs-datos-usuario ${formErrors.roleId ? 'error-input' : ''}`}
-                  value={form.role_id}
+                  name="user_type"
+                  className={`text-font inputs-datos-usuario ${formErrors.user_type ? 'error-input' : ''}`}
+                  value={form.user_type}
                   onIonChange={handleChange}
                   placeholder="Selecciona un rol"
                 >
-                  <IonSelectOption value={1}>Estudiante</IonSelectOption>
-                  <IonSelectOption value={2}>Profesor</IonSelectOption>
-                  <IonSelectOption value={3}>Administrador</IonSelectOption>
+                  <IonSelectOption value="Estudiante">Estudiante</IonSelectOption>
+                  <IonSelectOption value="Profesor">Profesor</IonSelectOption>
                 </IonSelect>
-                {formErrors.role_id && <div className="error-message">{formErrors.role_id}</div>}
+                {formErrors.user_type && <div className="error-message">{formErrors.user_type}</div>}
               </div>
               <div style={{ textAlign: 'center', marginTop: '20px' }}>
                 {isLoading ? (
@@ -199,7 +262,7 @@ const Register: React.FC = () => {
         onDidDismiss={() => setIsModalOpen(false)}
         mode="ios"
       />
-       
+
       <IonAlert
         className='text-font'
         isOpen={isErrorModalOpen}

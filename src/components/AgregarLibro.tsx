@@ -29,6 +29,7 @@ interface FormState {
     book_type_id: number;
     pnf_id: number;
     description: string;
+    user_id: number
 }
 
 const SubirLibro: React.FC = () => {
@@ -36,7 +37,7 @@ const SubirLibro: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
-    
+
 
     const history = useHistory();
     const [bookTypes, setBookTypes] = useState<BookType[]>([]);
@@ -49,6 +50,7 @@ const SubirLibro: React.FC = () => {
         book_type_id: 0,
         pnf_id: 0,
         description: '',
+        user_id: 0
     });
 
 
@@ -62,8 +64,21 @@ const SubirLibro: React.FC = () => {
         axios.get<PNF[]>('https://library-0a07.onrender.com/pnf/')
             .then(response => setPnfs(response.data))
             .catch(error => console.error('Error fetching PNFs:', error));
+       
+
+        const storedUserId = localStorage.getItem('userData');
+        const encontrado = JSON.parse(storedUserId)
+        const user_id = encontrado.id
+        console.log(user_id)
+        
+        if (storedUserId) {
+            setForm(prevForm => ({
+                ...prevForm,
+                user_id: Number(user_id) // Asegúrate de convertirlo a número si es necesario
+            }));
+        }
     }, []);
-    
+
     const handleChange = (e: CustomEvent) => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
         const { name, value } = target;
@@ -77,7 +92,7 @@ const SubirLibro: React.FC = () => {
         }));
     };
 
-    const handleSubmit = async (e:React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // Verifica que todos los campos estén llenos
         const errors: { [key: string]: string } = {};
@@ -114,7 +129,7 @@ const SubirLibro: React.FC = () => {
     const handleModalClose = () => {
         setIsModalOpen(false);
         history.push('/libros'); // Redirige a la página de libros
-        window.location.reload()
+        // window.location.reload()
     };
 
 
@@ -204,7 +219,7 @@ const SubirLibro: React.FC = () => {
                                             <div>
                                                 <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}> Tipo</span>
                                                 <IonSelect
-                                                  className={`text-font ${formErrors.book_type_id ? 'error-input' : ''}`}
+                                                    className={`text-font ${formErrors.book_type_id ? 'error-input' : ''}`}
                                                     name="book_type_id"
                                                     placeholder="Seleccionar tipo de libro"
                                                     style={{ textAlign: 'center', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.18)', borderRadius: '5px', padding: '8px', fontSize: '13px' }}
@@ -216,7 +231,7 @@ const SubirLibro: React.FC = () => {
                                                         <IonSelectOption className="text-font" key={type.id} value={type.id}>{type.name}</IonSelectOption>
                                                     ))}
                                                 </IonSelect>
-                                               
+
                                                 {formErrors.book_type_id && <div className="error-message">{formErrors.book_type_id}</div>}
                                             </div>
                                         </IonCol>
@@ -237,20 +252,20 @@ const SubirLibro: React.FC = () => {
                                                     ))}
                                                 </IonSelect>
                                                 {formErrors.pnf_id && <div className="error-message">{formErrors.pnf_id}</div>}
-                                               
+
                                             </div>
                                         </IonCol>
                                         <IonCol size='12'>
                                             <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Descripción o reseña</span>
                                             <div>
                                                 <IonTextarea
-                                                   className={`text-font inputs-datos-usuario ${formErrors.description ? 'error-input' : ''}`}
+                                                    className={`text-font inputs-datos-usuario ${formErrors.description ? 'error-input' : ''}`}
                                                     placeholder="Reseña o sipnosis del libro"
                                                     name="description"
                                                     value={form.description}
                                                     onIonChange={handleChange}
                                                 />
-                                                 {formErrors.description && <div className="error-message">{formErrors.description}</div>}
+                                                {formErrors.description && <div className="error-message">{formErrors.description}</div>}
                                             </div>
                                         </IonCol>
                                     </IonRow>

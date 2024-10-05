@@ -1,11 +1,13 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import { IonCard, IonCardContent, IonInput, IonButton, IonPage, IonText, IonAlert} from '@ionic/react';
+import { IonCard, IonCardContent, IonInput, IonButton, IonPage, IonText, IonAlert } from '@ionic/react';
 import { Link } from 'react-router-dom';
 import iconIut from '../images/logoIut.png';
 import './Login.css';
 import LoadingSpinner from './LoadingSpinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 interface LoginProps { }
 
@@ -18,6 +20,7 @@ const Login: React.FC<LoginProps> = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<FormState>({
     email: '',
     password: '',
@@ -63,7 +66,10 @@ const Login: React.FC<LoginProps> = () => {
       }
     }
   };
-
+  const togglePasswordVisibility = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Previene la propagación del evento
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <IonPage>
@@ -87,18 +93,29 @@ const Login: React.FC<LoginProps> = () => {
                 ></IonInput>
                 {errors.email && <div className="error-message">{errors.email}</div>}
               </div>
-              <div >
-                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px', display: 'flex', justifyContent: 'center' }}>Contraseña</span>
+
+              <div style={{ position: 'relative' }}>
+
                 <IonInput
                   className={`text-font inputs-datos-usuario ${form.password ? 'error-input' : ''}`}
                   name="password"
                   value={form.password}
-                  onIonInput={handleInputChange}
+                  onIonChange={handleInputChange}
                   placeholder="Contraseña"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   style={{ textAlign: 'center', fontSize: '16px', padding: '8px', border: 'none', background: 'transparent', width: '100%' }}
-                ></IonInput>
-                {errors.password && <div className="error-message">{errors.password}</div>}
+                />
+
+                <button
+                  onClick={togglePasswordVisibility}
+                  style={{ zIndex: 1000, position: 'absolute', right: '10px', top: '36%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                  onMouseDown={(e) => e.preventDefault()} // Previene el efecto de enfoque del input
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+                </button>
+                <div style={{ height: '20px', textAlign: 'center' }}>
+                  {errors.password && <div className="error-message">{errors.password}</div>}
+                </div>
               </div>
               <div className="text-font" style={{ textAlign: 'center', marginTop: '20px' }}>
                 <Link to="/bienvenida">
@@ -106,34 +123,36 @@ const Login: React.FC<LoginProps> = () => {
                 </Link>
 
               </div>
+
             </form>
+
             <div className="text-font" style={{ textAlign: 'center', marginTop: '20px' }}>
               <Link to="/register">
                 <IonButton size="small" color="medium" className="text-font" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: "9px" }}>¿Eres nuevo? ¡Registrate!</IonButton>
               </Link>
             </div>
-           
+
           </IonCardContent>
-          
+
         </IonCard>
         {isLoading && (
-              <div className="spinner-overlay">
-                <LoadingSpinner />
-              </div>
-            )}
+          <div className="spinner-overlay">
+            <LoadingSpinner />
+          </div>
+        )}
 
-            <IonAlert
-              className='text-font'
-              isOpen={isErrorModalOpen}
-              header="Error"
-              message="No se pudo iniciar sesión. Por favor, intente de nuevo más tarde."
-              buttons={[{
-                text: 'Aceptar',
-                handler: () => setIsErrorModalOpen(false),
-              }]}
-              onDidDismiss={() => setIsErrorModalOpen(false)}
-              mode="ios"
-            />
+        <IonAlert
+          className='text-font'
+          isOpen={isErrorModalOpen}
+          header="Error"
+          message="No se pudo iniciar sesión. Por favor, intente de nuevo más tarde."
+          buttons={[{
+            text: 'Aceptar',
+            handler: () => setIsErrorModalOpen(false),
+          }]}
+          onDidDismiss={() => setIsErrorModalOpen(false)}
+          mode="ios"
+        />
       </div>
     </IonPage>
   );

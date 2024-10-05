@@ -28,6 +28,7 @@ interface FormState {
     book_type_id: number;
     pnf_id: number;
     description: string;
+    user_id: number
 }
 
 const EditarLibro: React.FC = () => {
@@ -46,22 +47,33 @@ const EditarLibro: React.FC = () => {
         book_type_id: 0,
         pnf_id: 0,
         description: '',
+        user_id:0
     });
 
     const history = useHistory();
     const { id } = useParams<{ id: string }>(); // ID del libro a editar
+
+
     useEffect(() => {
+       
         fetchData();
     }, [id]);
 
 
     const fetchData = async () => {
+        const storedUserId = localStorage.getItem('userData');
+        const encontrado = JSON.parse(storedUserId);
+        const user_id = encontrado ? encontrado.id : 0; 
+
         setIsLoading(true)
         try {
             // Fetch book types
 
             const bookTypesResponse = await axios.get<BookType[]>('https://library-0a07.onrender.com/book_type/');
             setBookTypes(bookTypesResponse.data);
+            console.log("aqui", bookTypesResponse.data)
+            console.log(bookTypes)
+            
 
             // Fetch PNFs
             const pnfsResponse = await axios.get<PNF[]>('https://library-0a07.onrender.com/pnf/');
@@ -70,7 +82,11 @@ const EditarLibro: React.FC = () => {
             // Fetch book details for editing
             const bookResponse = await axios.get<FormState>(`https://library-0a07.onrender.com/book/${id}/`);
             setForm(bookResponse.data);
-
+            
+            setForm({
+                ...bookResponse.data,
+                user_id: Number(user_id), // Asegúrate de convertirlo a número
+            });
             setIsLoading(false)
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -131,7 +147,7 @@ const EditarLibro: React.FC = () => {
     const handleModalClose = () => {
         setIsModalOpen(false);
         history.push('/libros'); // Redirige a la página de libros
-        window.location.reload()
+        
     };
 
     const handleNetworkErrorClose = () => setIsNetworkErrorModalOpen(false);

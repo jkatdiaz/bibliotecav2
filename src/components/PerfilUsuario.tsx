@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 import registro from './../images/fondosss-removebg-preview.png'
 import axios from 'axios';
+import LoadingSpinner from './LoadingSpinner';
 
 
 import Drawer from './Drawer';
@@ -24,6 +25,7 @@ const PerfilUsuario: React.FC = () => {
 
     const [userData, setUserData] = useState<any>(null); // Cambia `any` por una interfaz adecuada si la defines
     const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const storedData = localStorage.getItem('userData');
@@ -34,12 +36,15 @@ const PerfilUsuario: React.FC = () => {
     }, []);
 
     const fetchUserData = async (id: number) => {
+        setIsLoading(true);
         try {
             const response = await axios.get(`https://library-0a07.onrender.com/user/${id}`);
             setUserData(response.data[0]); // Asumiendo que la respuesta es un array
         } catch (err) {
             console.error('Error fetching user data:', err);
             setError('No se pudo cargar la información del usuario.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -69,8 +74,11 @@ const PerfilUsuario: React.FC = () => {
                     <IonCard className='carddos-datos-usuario'>
                         <IonCardContent style={{ paddingBottom: '0px' }}>
                             <IonCardTitle className="text-font" style={{ textAlign: 'center', marginBottom: "10px", fontSize: "19px" }}>Perfil del Usuario</IonCardTitle>
-                            {error && <div className="error-message">{error}</div>}
-                            {userData ? (
+                            {isLoading ? (
+                                <LoadingSpinner />
+                            ) : error ? (
+                                <div className="error-message">{error}</div>
+                            ) : userData ? (
                                 <form >
                                     <IonRow>
                                         <IonCol size='6'>
@@ -115,7 +123,7 @@ const PerfilUsuario: React.FC = () => {
                                             </div>
 
                                         </IonCol>
-                                        <IonCol size='6'>
+                                        {/* <IonCol size='6'>
                                             <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>PNF</span>
                                             <div style={{ marginBottom: '12px' }}>
                                                 <IonInput
@@ -128,8 +136,8 @@ const PerfilUsuario: React.FC = () => {
 
                                             </div>
 
-                                        </IonCol>
-                                        <IonCol size='6'>
+                                        </IonCol> */}
+                                        {/* <IonCol size='6'>
                                             <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Trayecto</span>
                                             <div style={{ marginBottom: '12px' }}>
                                                 <IonInput
@@ -143,7 +151,7 @@ const PerfilUsuario: React.FC = () => {
 
                                             </div>
 
-                                        </IonCol>
+                                        </IonCol> */}
                                         <IonCol size='6'>
                                             <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Rol</span>
                                             <div style={{ marginBottom: '12px' }}>
@@ -159,11 +167,27 @@ const PerfilUsuario: React.FC = () => {
 
                                         </IonCol>
 
+                                        <IonCol size='6'>
+                                            <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Rol</span>
+                                            <div style={{ marginBottom: '12px' }}>
+                                                <IonInput
+                                                    className="text-font inputs-datos-usuario"
+                                                    placeholder="Rol"
+                                                    value={userData.user_type}
+                                                    disabled
+                                                    style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
+                                                />
+
+                                            </div>
+
+                                        </IonCol>
+
                                     </IonRow>
 
                                 </form>
+
                             ) : (
-                                <div>Cargando datos del usuario...</div>
+                                <div>No se encontraron datos del usuario.</div>
                             )}
                             <div className='div-imagen-perfil-usuario'>
                                 <img src={registro} alt="Imagen de bienvenida" className="imagen-perfil-usuario" />
