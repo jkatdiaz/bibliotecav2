@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from './LoadingSpinner';
 import Drawer from './Drawer';
+import PdfViewer from './VisualizarLibro';
 import './styles.css';
 
 interface BookType {
@@ -56,7 +57,7 @@ const VerLibro: React.FC = () => {
     useEffect(() => {
         fetchData();
     }, [id]);
-   
+
     const fetchData = async () => {
         setIsLoading(true);
         try {
@@ -103,7 +104,12 @@ const VerLibro: React.FC = () => {
         setIsModalOpen(false);
         history.push('/libros'); // Redirige a la página de libros
     };
-
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const handleShowPdf = () => {
+        
+        setPdfUrl('https://drive.google.com/uc?export=download&id=135EJEEBmr2oMy0viejI1PE92Cb5gG1tz');
+    };
+    
     return (
         <>
             <Drawer />
@@ -268,6 +274,11 @@ const VerLibro: React.FC = () => {
                                                 </div>
                                             </IonCol>
                                         </IonRow>
+                                        <div>
+                                            <IonButton onClick={handleShowPdf}>Mostrar PDF</IonButton>
+                                            {pdfUrl && <PdfViewer pdfUrl={pdfUrl} />}
+                                        </div>
+
                                         <div style={{ textAlign: 'center' }}>
                                             <IonButton
                                                 color="secondary"
