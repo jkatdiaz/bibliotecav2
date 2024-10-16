@@ -89,6 +89,18 @@ const Login: React.FC<LoginProps> = () => {
     setShowPassword((prev) => !prev);
   };
 
+
+  const resetForm = () => {
+    setForm({
+        email: '',
+        password: ''
+    });
+
+    setIsLoading(false);
+    setIsErrorModalOpen(false);
+    setShowPassword(false);
+};
+
   return (
     <IonPage>
       <div className="text-font card-login">
@@ -214,6 +226,7 @@ const Login: React.FC<LoginProps> = () => {
             >
               <Link to="/register">
                 <IonButton
+                onClick={()=>resetForm()}
                   size="small"
                   color="medium"
                   className="text-font"

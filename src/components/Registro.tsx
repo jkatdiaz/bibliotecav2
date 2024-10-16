@@ -116,6 +116,25 @@ const Register: React.FC = () => {
     await fetchData;
   };
 
+
+  const resetForm = () => {
+    setForm({
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+        user_type: '',
+        role_id: 2
+    });
+    
+    setUserData(null);
+    setFormErrors({});
+    setIsLoading(false);
+    setIsErrorModalOpen(false);
+    setIsModalOpen(false);
+    setShowPassword(false);
+};
+
   return (
     <IonPage>
       <div className="text-font" style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(208, 228, 243)' }}>
@@ -241,8 +260,8 @@ const Register: React.FC = () => {
               </div>
             </form>
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
-              <Link to="/home">
-                <IonButton size="small" color="medium" className="text-font" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: "9px" }}>Volver a Iniciar Sesión</IonButton>
+              <Link to="/login">
+                <IonButton onClick={()=>resetForm()}size="small" color="medium" className="text-font" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: "9px" }}>Volver a Iniciar Sesión</IonButton>
               </Link>
             </div>
           </IonCardContent>

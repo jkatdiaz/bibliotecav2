@@ -85,12 +85,14 @@ const EditarLibro: React.FC = () => {
             // Fetch book details for editing
             const bookResponse = await axios.get<FormState>(`https://library-0a07.onrender.com/book/${id}/`);
             setForm(bookResponse.data);
-         
+
 
             setForm({
                 ...bookResponse.data,
                 user_id: Number(user_id), // Asegúrate de convertirlo a número
             });
+
+
             setIsLoading(false)
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -113,6 +115,9 @@ const EditarLibro: React.FC = () => {
             [name]: newValue,
         }));
     };
+
+
+
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file && file.type === "application/pdf") {
@@ -144,7 +149,7 @@ const EditarLibro: React.FC = () => {
             if (response.data) {
                 console.log("File uploaded successfully:", response.data);
                 setDownloadUrl(response.data.url);
-             
+
 
                 return true;
             }
@@ -176,6 +181,7 @@ const EditarLibro: React.FC = () => {
             const response = await axios.put(`https://library-0a07.onrender.com/book/${id}/`, form);
             if (response.data) {
                 setIsModalOpen(true); // Abre el modal si la respuesta es exitosa
+              
             } else {
                 console.error('Error updating the book');
                 setIsErrorModalOpen(true)
@@ -205,6 +211,10 @@ const EditarLibro: React.FC = () => {
     const handleCancel = () => {
         setIsNetworkErrorModalOpen(false); // Just close the modal
     };
+
+  
+
+
     return (
         <>
             <Drawer />
@@ -222,7 +232,10 @@ const EditarLibro: React.FC = () => {
                         className="boton-volver"
                         shape="round"
                         color="medium"
-                        onClick={() => setFormErrors({})}
+                        onClick={() => {
+                            setFormErrors({}); // Limpiar los errores del formulario
+                        
+                        }}
                     >
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />
                         <div className="text-font" style={{ textTransform: 'capitalize' }}>
@@ -368,7 +381,6 @@ const EditarLibro: React.FC = () => {
                                                         accept="application/pdf"
                                                         onChange={handleFileChange}
                                                     />
-                                                    
                                                 </IonItem>
                                                 {!isPdfValid && <div className="error-message">Adjuntar PDF es obligatorio.</div>} {/* Mensaje de error */}
                                                 <div style={{ textAlign: "center" }}>
@@ -382,17 +394,17 @@ const EditarLibro: React.FC = () => {
                                                         }}
                                                         className="text-font"
                                                         onClick={handleUpload}
-                                                       
+
                                                     >
                                                         Cargar
                                                     </IonButton>
                                                 </div>
-                                                </IonCol>
+                                            </IonCol>
                                         </IonRow>
                                         <div style={{ textAlign: 'center' }}>
                                             <IonButton
                                                 color="secondary"
-                                             
+
                                                 type="submit"
                                                 style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }}
                                                 className="text-font"

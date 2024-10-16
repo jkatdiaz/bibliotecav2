@@ -61,6 +61,7 @@ const SubirLibro: React.FC = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [downloadUrl, setDownloadUrl] = useState<string>("");
   const [isPdfValid, setIsPdfValid] = useState(true);
+  const [isUploadSuccess, setIsUploadSuccess] = useState(false)
   const history = useHistory();
   const [bookTypes, setBookTypes] = useState<BookType[]>([]);
   const [pnfs, setPnfs] = useState<PNF[]>([]);
@@ -135,7 +136,7 @@ const SubirLibro: React.FC = () => {
       setFormErrors(errors);
       return;
     }
-  
+
     const updatedForm = {
       ...form,
       download_url: downloadUrl, // Asegúrate de que downloadUrl tenga un valor válido
@@ -149,6 +150,7 @@ const SubirLibro: React.FC = () => {
         updatedForm
       );
       if (response.data) {
+        resetForm()
         setIsModalOpen(true); // Abre el modal si la respuesta es exitosa
       } else {
         console.error("Error al añadir el libro");
@@ -181,7 +183,7 @@ const SubirLibro: React.FC = () => {
 
     }
   };
-  
+
 
 
   const handleUpload = async () => {
@@ -234,7 +236,28 @@ const SubirLibro: React.FC = () => {
   //       console.error("Error uploading file:", error);
   //     });
   // };
-
+  const resetForm = () => {
+    setForm({
+      name: '',
+      publication_year: '',
+      author: '',
+      download_url: '',
+      book_type_id: 0,
+      pnf_id: 0,
+      description: '',
+      user_id: 0
+    });
+    setFormErrors({});
+    setSelectedFile(null);
+    setIsModalOpen(false);
+    setIsLoading(false);
+    setIsErrorModalOpen(false);
+    setFormErrors({});
+    setDownloadUrl("");
+    setIsPdfValid(true);
+    setIsUploadSuccess(false);
+    
+  };
   return (
     <>
       <Drawer />
@@ -249,7 +272,10 @@ const SubirLibro: React.FC = () => {
         </IonHeader>
         <Link to="/libros" className="no-underline">
           <IonButton
-            onClick={() => setFormErrors({})}
+            onClick={() => {
+              setFormErrors({}); // Limpiar los errores del formulario
+              resetForm(); // Limpiar el formulario
+            }}
             className="boton-volver"
             shape="round"
             color="medium"
@@ -500,7 +526,7 @@ const SubirLibro: React.FC = () => {
                           accept="application/pdf"
                           onChange={handleFileChange}
                         />
-                         
+
                       </IonItem>
                       {!isPdfValid && <div className="error-message">Adjuntar PDF es obligatorio.</div>} {/* Mensaje de error */}
                       <div style={{ textAlign: "center" }}>
