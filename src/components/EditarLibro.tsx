@@ -38,6 +38,9 @@ const EditarLibro: React.FC = () => {
     const [isNetworkErrorModalOpen, setIsNetworkErrorModalOpen] = useState(false);
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
     const [bookTypes, setBookTypes] = useState<BookType[]>([]);
+    const [isPdfValid, setIsPdfValid] = useState(true);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [downloadUrl, setDownloadUrl] = useState<string>("");
     const [pnfs, setPnfs] = useState<PNF[]>([]);
     const [form, setForm] = useState<FormState>({
         name: '',
@@ -47,7 +50,7 @@ const EditarLibro: React.FC = () => {
         book_type_id: 0,
         pnf_id: 0,
         description: '',
-        user_id:0
+        user_id: 0
     });
 
     const history = useHistory();
@@ -55,7 +58,7 @@ const EditarLibro: React.FC = () => {
 
 
     useEffect(() => {
-       
+
         fetchData();
     }, [id]);
 
@@ -63,7 +66,7 @@ const EditarLibro: React.FC = () => {
     const fetchData = async () => {
         const storedUserId = localStorage.getItem('userData');
         const encontrado = JSON.parse(storedUserId);
-        const user_id = encontrado ? encontrado.id : 0; 
+        const user_id = encontrado ? encontrado.id : 0;
 
         setIsLoading(true)
         try {
@@ -73,7 +76,7 @@ const EditarLibro: React.FC = () => {
             setBookTypes(bookTypesResponse.data);
             console.log("aqui", bookTypesResponse.data)
             console.log(bookTypes)
-            
+
 
             // Fetch PNFs
             const pnfsResponse = await axios.get<PNF[]>('https://library-0a07.onrender.com/pnf/');
@@ -82,7 +85,8 @@ const EditarLibro: React.FC = () => {
             // Fetch book details for editing
             const bookResponse = await axios.get<FormState>(`https://library-0a07.onrender.com/book/${id}/`);
             setForm(bookResponse.data);
-            
+         
+
             setForm({
                 ...bookResponse.data,
                 user_id: Number(user_id), // Asegúrate de convertirlo a número
@@ -109,8 +113,48 @@ const EditarLibro: React.FC = () => {
             [name]: newValue,
         }));
     };
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.type === "application/pdf") {
+            setSelectedFile(file);
+            setIsPdfValid(true); // El PDF es válido
+        } else {
+            setSelectedFile(null);
+            setIsPdfValid(false); // El PDF no es válido
 
-    const handleSubmit = async (e:React.FormEvent) => {
+        }
+    };
+
+
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            alert("No file selected.");
+            return false; // Retornar falso si no hay archivo
+        }
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        try {
+            const response = await axios.post(
+                "https://library-0a07.onrender.com/book/upload/",
+                formData
+            );
+            if (response.data) {
+                console.log("File uploaded successfully:", response.data);
+                setDownloadUrl(response.data.url);
+             
+
+                return true;
+            }
+        } catch (error) {
+            console.error("Error uploading file:", error);
+            return false;
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // Verifica que todos los campos estén llenos
         const errors: { [key: string]: string } = {};
@@ -147,7 +191,7 @@ const EditarLibro: React.FC = () => {
     const handleModalClose = () => {
         setIsModalOpen(false);
         history.push('/libros'); // Redirige a la página de libros
-        
+
     };
 
     const handleNetworkErrorClose = () => setIsNetworkErrorModalOpen(false);
@@ -156,7 +200,7 @@ const EditarLibro: React.FC = () => {
         setIsNetworkErrorModalOpen(false); // Close the error modal
         await fetchData(); // Retry fetching data
     };
-    
+
 
     const handleCancel = () => {
         setIsNetworkErrorModalOpen(false); // Just close the modal
@@ -303,10 +347,52 @@ const EditarLibro: React.FC = () => {
                                                     {formErrors.description && <div className="error-message">{formErrors.description}</div>}
                                                 </div>
                                             </IonCol>
+                                            {/* add upload pdf */}
+                                            <IonCol size="12">
+                                                <span
+                                                    className="text-font"
+                                                    style={{
+                                                        textAlign: "center",
+                                                        color: "black",
+                                                        fontWeight: "500",
+                                                        fontSize: "13px",
+                                                    }}
+                                                >
+                                                    Adjuntar PDF
+                                                </span>
+                                                <IonItem className="text-font bg-white">
+                                                    <input
+                                                        className="text-font bg-white"
+                                                        style={{ fontSize: '12px' }}
+                                                        type="file"
+                                                        accept="application/pdf"
+                                                        onChange={handleFileChange}
+                                                    />
+                                                    
+                                                </IonItem>
+                                                {!isPdfValid && <div className="error-message">Adjuntar PDF es obligatorio.</div>} {/* Mensaje de error */}
+                                                <div style={{ textAlign: "center" }}>
+                                                    <IonButton
+                                                        color="dark"
+
+                                                        style={{
+                                                            borderRadius: "10px",
+                                                            textTransform: "capitalize",
+                                                            fontSize: "13px",
+                                                        }}
+                                                        className="text-font"
+                                                        onClick={handleUpload}
+                                                       
+                                                    >
+                                                        Cargar
+                                                    </IonButton>
+                                                </div>
+                                                </IonCol>
                                         </IonRow>
                                         <div style={{ textAlign: 'center' }}>
                                             <IonButton
                                                 color="secondary"
+                                             
                                                 type="submit"
                                                 style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }}
                                                 className="text-font"

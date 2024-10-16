@@ -371,3 +371,20 @@ ion-menu::part(container) {
     width: 100%; /* Tarjetas ocupan el ancho completo en pantallas muy pequeñas */
   }
 }
+
+
+.custom-file-input {
+  display: block;
+  font-size: 12px;
+  padding: 10px;
+  color: #fff;
+  background-color: #007bff; /* Color de fondo */
+  border: none; /* Sin borde */
+  border-radius: 5px; /* Bordes redondeados */
+  cursor: pointer; /* Cursor tipo puntero */
+  transition: background-color 0.3s; /* Transición suave para el color */
+}
+
+.custom-file-input:hover {
+  background-color: #0056b3; /* Color al pasar el mouse */
+}

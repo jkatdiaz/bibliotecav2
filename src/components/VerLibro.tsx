@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from './LoadingSpinner';
 import Drawer from './Drawer';
+import PdfViewer from './VisualizarLibro';
 import './styles.css';
 
 interface BookType {
@@ -36,6 +37,7 @@ const VerLibro: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [isNetworkErrorModalOpen, setIsNetworkErrorModalOpen] = useState(false);
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const [form, setForm] = useState<FormState>({
         name: '',
         book_type: '',
@@ -52,11 +54,21 @@ const VerLibro: React.FC = () => {
 
     const history = useHistory();
     const { id } = useParams<{ id: string }>(); // ID del libro a visualizar
+    const [showPdf, setShowPdf] = useState(false); 
 
     useEffect(() => {
         fetchData();
     }, [id]);
    
+    const handleShowPdf = () => {
+        if (pdfUrl) {
+            setShowPdf(true); // Cambia el estado para mostrar el PDF
+        }
+    };
+
+    if (showPdf && pdfUrl) {
+        return <PdfViewer pdfUrl={pdfUrl} />; // Muestra el PDF si el estado está activo
+    }
     const fetchData = async () => {
         setIsLoading(true);
         try {
@@ -77,6 +89,7 @@ const VerLibro: React.FC = () => {
             console.log(form)
             console.log(bookTypes, "aqui")
             console.log('selected value:', form.book_type);
+            setPdfUrl(bookResponse.data.download_url)
 
             setIsLoading(false);
         } catch (error) {
@@ -183,7 +196,7 @@ const VerLibro: React.FC = () => {
                                                     />
                                                 </div>
                                             </IonCol>
-                                            <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
+                                            {/* <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Adjuntar libro</span>
                                                     <IonInput
@@ -197,7 +210,7 @@ const VerLibro: React.FC = () => {
 
                                                     />
                                                 </div>
-                                            </IonCol>
+                                            </IonCol> */}
                                             <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Tipo</span>
@@ -268,6 +281,10 @@ const VerLibro: React.FC = () => {
                                                 </div>
                                             </IonCol>
                                         </IonRow>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <IonButton  className="text-font" color="dark" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }} onClick={handleShowPdf}>Mostrar PDF</IonButton>
+                                          
+                                        </div>
                                         <div style={{ textAlign: 'center' }}>
                                             <IonButton
                                                 color="secondary"

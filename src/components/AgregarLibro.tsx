@@ -59,7 +59,8 @@ const SubirLibro: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
-
+  const [downloadUrl, setDownloadUrl] = useState<string>("");
+  const [isPdfValid, setIsPdfValid] = useState(true);
   const history = useHistory();
   const [bookTypes, setBookTypes] = useState<BookType[]>([]);
   const [pnfs, setPnfs] = useState<PNF[]>([]);
@@ -125,20 +126,27 @@ const SubirLibro: React.FC = () => {
     if (!form.publication_year)
       errors.publication_year = "Este campo es obligatorio";
     if (!form.author) errors.author = "Este campo es obligatorio";
-    if (!form.download_url) errors.download_url = "Este campo es obligatorio";
     if (!form.book_type_id) errors.book_type_id = "Este campo es obligatorio";
     if (!form.pnf_id) errors.pnf_id = "Este campo es obligatorio";
     if (!form.description) errors.description = "Este campo es obligatorio";
+    if (!selectedFile) errors.download_url = "Adjuntar PDF es obligatorio";
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
+  
+    const updatedForm = {
+      ...form,
+      download_url: downloadUrl, // Asegúrate de que downloadUrl tenga un valor válido
+    };
+
+    console.log(form)
     setIsLoading(true);
     try {
       const response = await axios.post(
         "https://library-0a07.onrender.com/book/",
-        form
+        updatedForm
       );
       if (response.data) {
         setIsModalOpen(true); // Abre el modal si la respuesta es exitosa
@@ -159,37 +167,73 @@ const SubirLibro: React.FC = () => {
     // window.location.reload()
   };
 
+
+  console.log(downloadUrl)
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type === "application/pdf") {
       setSelectedFile(file);
+      setIsPdfValid(true); // El PDF es válido
     } else {
-      alert("Please select a PDF file.");
+      setSelectedFile(null);
+      setIsPdfValid(false); // El PDF no es válido
+
     }
   };
+  
 
-  const handleUpload = () => {
+
+  const handleUpload = async () => {
     if (!selectedFile) {
       alert("No file selected.");
-      return;
+      return false; // Retornar falso si no hay archivo
     }
 
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    fetch("https://library-0a07.onrender.com/book/upload/", {
-      // Asegúrate de que la URL coincida con tu servidor
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        console.log("File uploaded successfully:", data);
-      })
-      .catch((error) => {
-        console.error("Error uploading file:", error);
-      });
+    try {
+      const response = await axios.post(
+        "https://library-0a07.onrender.com/book/upload/",
+        formData
+      );
+      if (response.data) {
+        console.log("File uploaded successfully:", response.data);
+        setDownloadUrl(response.data.url);
+        setIsUploadSuccess(true); // Marcar como éxito si la carga fue exitosa
+
+        return true;
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      setIsUploadSuccess(false); // Marcar como fallo en caso de error
+      return false;
+    }
   };
+  // const handleUpload = () => {
+  //   if (!selectedFile) {
+
+  //     setIsPdfValid(false);
+  //     return;
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append("file", selectedFile);
+
+  //   fetch("https://library-0a07.onrender.com/book/upload/", {
+  //     // Asegúrate de que la URL coincida con tu servidor
+  //     method: "POST",
+  //     body: formData,
+  //   })
+  //     .then((response) => response.text())
+  //     .then((data) => {
+  //       console.log("File uploaded successfully:", data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error uploading file:", error);
+  //     });
+  // };
 
   return (
     <>
@@ -220,7 +264,7 @@ const SubirLibro: React.FC = () => {
           <div className="text-font card-datos-usuario">
             <IonCard className="carddos-datos-usuario">
               <IonCardContent>
-                <form onSubmit={handleSubmit}>
+                <form >
                   <IonRow>
                     <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
                       <div>
@@ -238,9 +282,8 @@ const SubirLibro: React.FC = () => {
                         </span>
                         <IonInput
                           type="text"
-                          className={`text-font inputs-datos-usuario ${
-                            formErrors.name ? "error-input" : ""
-                          }`}
+                          className={`text-font inputs-datos-usuario ${formErrors.name ? "error-input" : ""
+                            }`}
                           placeholder="Nombre del Libro"
                           name="name"
                           value={form.name}
@@ -267,9 +310,8 @@ const SubirLibro: React.FC = () => {
                         </span>
                         <IonInput
                           type="number"
-                          className={`text-font inputs-datos-usuario ${
-                            formErrors.publication_year ? "error-input" : ""
-                          }`}
+                          className={`text-font inputs-datos-usuario ${formErrors.publication_year ? "error-input" : ""
+                            }`}
                           name="publication_year"
                           placeholder="Año de publicación"
                           value={form.publication_year}
@@ -297,9 +339,8 @@ const SubirLibro: React.FC = () => {
                         </span>
                         <IonInput
                           type="text"
-                          className={`text-font inputs-datos-usuario ${
-                            formErrors.author ? "error-input" : ""
-                          }`}
+                          className={`text-font inputs-datos-usuario ${formErrors.author ? "error-input" : ""
+                            }`}
                           placeholder="Autor"
                           name="author"
                           value={form.author}
@@ -312,36 +353,7 @@ const SubirLibro: React.FC = () => {
                         )}
                       </div>
                     </IonCol>
-                    <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
-                      <div>
-                        <span
-                          className="text-font"
-                          style={{
-                            textAlign: "center",
-                            color: "black",
-                            fontWeight: "500",
-                            fontSize: "13px",
-                          }}
-                        >
-                          Adjuntar libro
-                        </span>
-                        <IonInput
-                          type="text"
-                          className={`text-font inputs-datos-usuario ${
-                            formErrors.download_url ? "error-input" : ""
-                          }`}
-                          placeholder="Adjuntar archivo"
-                          name="download_url"
-                          value={form.download_url}
-                          onIonChange={handleChange}
-                        ></IonInput>
-                        {formErrors.download_url && (
-                          <div className="error-message">
-                            {formErrors.download_url}
-                          </div>
-                        )}
-                      </div>
-                    </IonCol>
+
                     <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                       <div>
                         <span
@@ -357,9 +369,8 @@ const SubirLibro: React.FC = () => {
                           Tipo
                         </span>
                         <IonSelect
-                          className={`text-font ${
-                            formErrors.book_type_id ? "error-input" : ""
-                          }`}
+                          className={`text-font ${formErrors.book_type_id ? "error-input" : ""
+                            }`}
                           name="book_type_id"
                           placeholder="Seleccionar tipo de libro"
                           style={{
@@ -406,9 +417,8 @@ const SubirLibro: React.FC = () => {
                           PNF
                         </span>
                         <IonSelect
-                          className={`text-font ${
-                            formErrors.pnf_id ? "error-input" : ""
-                          }`}
+                          className={`text-font ${formErrors.pnf_id ? "error-input" : ""
+                            }`}
                           style={{
                             textAlign: "center",
                             width: "100%",
@@ -455,9 +465,8 @@ const SubirLibro: React.FC = () => {
                       </span>
                       <div>
                         <IonTextarea
-                          className={`text-font inputs-datos-usuario ${
-                            formErrors.description ? "error-input" : ""
-                          }`}
+                          className={`text-font inputs-datos-usuario ${formErrors.description ? "error-input" : ""
+                            }`}
                           placeholder="Reseña o sipnosis del libro"
                           name="description"
                           value={form.description}
@@ -472,31 +481,61 @@ const SubirLibro: React.FC = () => {
                     </IonCol>
                     {/* add upload pdf */}
                     <IonCol size="12">
-                      <IonItem>
-                        <IonLabel position="stacked">Upload PDF</IonLabel>
+                      <span
+                        className="text-font"
+                        style={{
+                          textAlign: "center",
+                          color: "black",
+                          fontWeight: "500",
+                          fontSize: "13px",
+                        }}
+                      >
+                        Adjuntar PDF
+                      </span>
+                      <IonItem className="text-font bg-white">
                         <input
+                          className="text-font bg-white"
+                          style={{ fontSize: '12px' }}
                           type="file"
                           accept="application/pdf"
                           onChange={handleFileChange}
                         />
+                         
                       </IonItem>
-                      <IonButton expand="full" onClick={() => handleUpload()}>
-                        Upload
-                      </IonButton>
+                      {!isPdfValid && <div className="error-message">Adjuntar PDF es obligatorio.</div>} {/* Mensaje de error */}
+                      <div style={{ textAlign: "center" }}>
+                        <IonButton
+                          color="dark"
+
+                          style={{
+                            borderRadius: "10px",
+                            textTransform: "capitalize",
+                            fontSize: "13px",
+                          }}
+                          className="text-font"
+                          onClick={handleUpload}
+                          disabled={!selectedFile} // Deshabilita el botón si no hay archivo
+                        >
+                          Cargar
+                        </IonButton>
+                      </div>
+
                     </IonCol>
                   </IonRow>
                   <div style={{ textAlign: "center" }}>
                     <IonButton
                       color="secondary"
-                      type="submit"
+
+                      disabled={!isUploadSuccess}
                       style={{
                         borderRadius: "10px",
                         textTransform: "capitalize",
                         fontSize: "13px",
                       }}
+                      onClick={handleSubmit}
                       className="text-font"
                     >
-                      Enviar
+                      Guardar
                     </IonButton>
                   </div>
                 </form>
