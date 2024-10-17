@@ -89,181 +89,178 @@ const Login: React.FC<LoginProps> = () => {
     setShowPassword((prev) => !prev);
   };
 
-
   const resetForm = () => {
     setForm({
-        email: '',
-        password: ''
+      email: "",
+      password: "",
     });
 
     setIsLoading(false);
     setIsErrorModalOpen(false);
     setShowPassword(false);
-};
+  };
 
   return (
-    <IonPage>
-      <div className="text-font card-login">
-        <IonCard className="text-font card2-login">
-          <IonCardContent className="text-font">
-            <div style={{ textAlign: "center", paddingBottom: "15px" }}>
-              <img
+    <div className="text-font card-login">
+      <IonCard className="text-font card2-login">
+        <IonCardContent className="text-font">
+          <div style={{ textAlign: "center", paddingBottom: "15px" }}>
+            <img
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                boxShadow: "0px 0px 9px 6px rgba(116, 127, 135, 0.59)",
+                backgroundColor: "rgb(73, 103, 155)",
+              }}
+              alt="Silhouette of mountains"
+              src={iconIut}
+            />
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: "12px" }}>
+              <span
+                className="text-font"
                 style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "50%",
-                  boxShadow: "0px 0px 9px 6px rgba(116, 127, 135, 0.59)",
-                  backgroundColor: "rgb(73, 103, 155)",
+                  textAlign: "center",
+                  color: "black",
+                  fontWeight: "500",
+                  fontSize: "13px",
+                  display: "flex",
+                  justifyContent: "center",
                 }}
-                alt="Silhouette of mountains"
-                src={iconIut}
-              />
+              >
+                Usuario o Correo
+              </span>
+              <IonInput
+                className={`text-font inputs-datos-usuario ${
+                  errors.email ? "error-input" : ""
+                }`}
+                name="email"
+                value={form.email}
+                onIonInput={handleInputChange}
+                placeholder="Usuario / Correo"
+                style={{
+                  textAlign: "center",
+                  fontSize: "16px",
+                  padding: "8px",
+                  border: "none",
+                  background: "transparent",
+                  width: "100%",
+                }}
+              ></IonInput>
+              {errors.email && (
+                <div className="error-message">{errors.email}</div>
+              )}
             </div>
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: "12px" }}>
-                <span
-                  className="text-font"
-                  style={{
-                    textAlign: "center",
-                    color: "black",
-                    fontWeight: "500",
-                    fontSize: "13px",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  Usuario o Correo
-                </span>
-                <IonInput
-                  className={`text-font inputs-datos-usuario ${
-                    errors.email ? "error-input" : ""
-                  }`}
-                  name="email"
-                  value={form.email}
-                  onIonInput={handleInputChange}
-                  placeholder="Usuario / Correo"
-                  style={{
-                    textAlign: "center",
-                    fontSize: "16px",
-                    padding: "8px",
-                    border: "none",
-                    background: "transparent",
-                    width: "100%",
-                  }}
-                ></IonInput>
-                {errors.email && (
-                  <div className="error-message">{errors.email}</div>
+
+            <div style={{ position: "relative" }}>
+              <IonInput
+                className={`text-font inputs-datos-usuario ${
+                  form.password ? "error-input" : ""
+                }`}
+                name="password"
+                value={form.password}
+                onIonChange={handleInputChange}
+                placeholder="Contraseña"
+                type={showPassword ? "text" : "password"}
+                style={{
+                  textAlign: "center",
+                  fontSize: "16px",
+                  padding: "8px",
+                  border: "none",
+                  background: "transparent",
+                  width: "100%",
+                }}
+              />
+
+              <button
+                onClick={togglePasswordVisibility}
+                type="button"
+                style={{
+                  zIndex: 1000,
+                  position: "absolute",
+                  right: "10px",
+                  top: "36%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                onMouseDown={(e) => e.preventDefault()} // Previene el efecto de enfoque del input
+              >
+                <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+              </button>
+              <div style={{ height: "20px", textAlign: "center" }}>
+                {errors.password && (
+                  <div className="error-message">{errors.password}</div>
                 )}
               </div>
-
-              <div style={{ position: "relative" }}>
-                <IonInput
-                  className={`text-font inputs-datos-usuario ${
-                    form.password ? "error-input" : ""
-                  }`}
-                  name="password"
-                  value={form.password}
-                  onIonChange={handleInputChange}
-                  placeholder="Contraseña"
-                  type={showPassword ? "text" : "password"}
-                  style={{
-                    textAlign: "center",
-                    fontSize: "16px",
-                    padding: "8px",
-                    border: "none",
-                    background: "transparent",
-                    width: "100%",
-                  }}
-                />
-
-                <button
-                  onClick={togglePasswordVisibility}
-                  type="button"
-                  style={{
-                    zIndex: 1000,
-                    position: "absolute",
-                    right: "10px",
-                    top: "36%",
-                    transform: "translateY(-50%)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                  onMouseDown={(e) => e.preventDefault()} // Previene el efecto de enfoque del input
-                >
-                  <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
-                </button>
-                <div style={{ height: "20px", textAlign: "center" }}>
-                  {errors.password && (
-                    <div className="error-message">{errors.password}</div>
-                  )}
-                </div>
-              </div>
-              <div
-                className="text-font"
-                style={{ textAlign: "center", marginTop: "20px" }}
-              >
-                <Link to="/bienvenida">
-                  <IonButton
-                    color="secondary"
-                    type="submit"
-                    style={{
-                      borderRadius: "10px",
-                      textTransform: "capitalize",
-                      fontSize: "13px",
-                    }}
-                    className="text-font"
-                  >
-                    Iniciar Sesión
-                  </IonButton>
-                </Link>
-              </div>
-            </form>
-
+            </div>
             <div
               className="text-font"
               style={{ textAlign: "center", marginTop: "20px" }}
             >
-              <Link to="/register">
+              <Link to="/bienvenida">
                 <IonButton
-                onClick={()=>resetForm()}
-                  size="small"
-                  color="medium"
-                  className="text-font"
+                  color="secondary"
+                  type="submit"
                   style={{
                     borderRadius: "10px",
                     textTransform: "capitalize",
-                    fontSize: "9px",
+                    fontSize: "13px",
                   }}
+                  className="text-font"
                 >
-                  ¿Eres nuevo? ¡Registrate!
+                  Iniciar Sesión
                 </IonButton>
               </Link>
             </div>
-          </IonCardContent>
-        </IonCard>
-        {isLoading && (
-          <div className="spinner-overlay">
-            <LoadingSpinner />
-          </div>
-        )}
+          </form>
 
-        <IonAlert
-          className="text-font"
-          isOpen={isErrorModalOpen}
-          header="Error"
-          message="No se pudo iniciar sesión. Por favor, intente de nuevo más tarde."
-          buttons={[
-            {
-              text: "Aceptar",
-              handler: () => setIsErrorModalOpen(false),
-            },
-          ]}
-          onDidDismiss={() => setIsErrorModalOpen(false)}
-          mode="ios"
-        />
-      </div>
-    </IonPage>
+          <div
+            className="text-font"
+            style={{ textAlign: "center", marginTop: "20px" }}
+          >
+            <Link to="/register">
+              <IonButton
+                onClick={() => resetForm()}
+                size="small"
+                color="medium"
+                className="text-font"
+                style={{
+                  borderRadius: "10px",
+                  textTransform: "capitalize",
+                  fontSize: "9px",
+                }}
+              >
+                ¿Eres nuevo? ¡Registrate!
+              </IonButton>
+            </Link>
+          </div>
+        </IonCardContent>
+      </IonCard>
+      {isLoading && (
+        <div className="spinner-overlay">
+          <LoadingSpinner />
+        </div>
+      )}
+
+      <IonAlert
+        className="text-font"
+        isOpen={isErrorModalOpen}
+        header="Error"
+        message="No se pudo iniciar sesión. Por favor, intente de nuevo más tarde."
+        buttons={[
+          {
+            text: "Aceptar",
+            handler: () => setIsErrorModalOpen(false),
+          },
+        ]}
+        onDidDismiss={() => setIsErrorModalOpen(false)}
+        mode="ios"
+      />
+    </div>
   );
 };
 
