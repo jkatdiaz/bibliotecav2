@@ -7,6 +7,7 @@ import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 import Drawer from './Drawer';
 
 const PdfViewer: React.FC<{ pdfUrl: string }> = ({ pdfUrl }) => {
+    
     return (
         <>
             <Drawer />
