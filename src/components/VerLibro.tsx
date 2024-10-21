@@ -21,6 +21,8 @@ interface PNF {
     name: string;
 }
 
+
+
 interface FormState {
     name: string;
     book_type: string;
@@ -51,24 +53,14 @@ const VerLibro: React.FC = () => {
     });
     const [bookTypes, setBookTypes] = useState<BookType[]>([]);
     const [pnfs, setPnfs] = useState<PNF[]>([]);
-
     const history = useHistory();
     const { id } = useParams<{ id: string }>(); // ID del libro a visualizar
-    const [showPdf, setShowPdf] = useState(false); 
+
 
     useEffect(() => {
         fetchData();
     }, [id]);
-   
-    const handleShowPdf = () => {
-        if (pdfUrl) {
-            setShowPdf(true); // Cambia el estado para mostrar el PDF
-        }
-    };
 
-    if (showPdf && pdfUrl) {
-        return <PdfViewer pdfUrl={pdfUrl} />; // Muestra el PDF si el estado está activo
-    }
     const fetchData = async () => {
         setIsLoading(true);
         try {
@@ -89,6 +81,7 @@ const VerLibro: React.FC = () => {
             console.log(form)
             console.log(bookTypes, "aqui")
             console.log('selected value:', form.book_type);
+            localStorage.setItem("pdfUrl",bookResponse.data.download_url)
             setPdfUrl(bookResponse.data.download_url)
 
             setIsLoading(false);
@@ -117,6 +110,12 @@ const VerLibro: React.FC = () => {
         history.push('/libros'); // Redirige a la página de libros
     };
 
+    
+    const resetVariable =()=>{
+        
+        localStorage.removeItem('pdfUrl')
+    }
+
     return (
         <>
             <Drawer />
@@ -135,7 +134,7 @@ const VerLibro: React.FC = () => {
                         className="boton-volver"
                         shape="round"
                         color="medium"
-
+                        onClick={resetVariable}
                     >
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />
                         <div className="text-font" style={{ textTransform: 'capitalize' }}>
@@ -281,9 +280,17 @@ const VerLibro: React.FC = () => {
                                                 </div>
                                             </IonCol>
                                         </IonRow>
+
                                         <div style={{ textAlign: 'center' }}>
-                                            <IonButton  className="text-font" color="dark" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }} onClick={handleShowPdf}>Mostrar PDF</IonButton>
-                                          
+                                            {pdfUrl && (
+                                                <Link to="/visualizarlibro">
+                                                    <IonButton className="text-font" color="dark" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }}>
+                                                        Mostrar PDF
+                                                    </IonButton>
+                                                </Link>
+                                            )}
+                                            {/* <IonButton className="text-font" color="dark" style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }} onClick={handleShowPdf}>Mostrar PDF</IonButton> */}
+
                                         </div>
                                         <div style={{ textAlign: 'center' }}>
                                             <IonButton

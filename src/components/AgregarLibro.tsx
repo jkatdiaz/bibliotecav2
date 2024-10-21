@@ -57,6 +57,7 @@ const SubirLibro: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPDF, setLoadingPDF] = useState(false)
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [downloadUrl, setDownloadUrl] = useState<string>("");
@@ -166,7 +167,7 @@ const SubirLibro: React.FC = () => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     history.push("/libros"); // Redirige a la página de libros
-    // window.location.reload()
+    
   };
 
 
@@ -195,6 +196,7 @@ const SubirLibro: React.FC = () => {
     const formData = new FormData();
     formData.append("file", selectedFile);
 
+    setLoadingPDF(true)
     try {
       const response = await axios.post(
         "https://library-0a07.onrender.com/book/upload/",
@@ -204,38 +206,17 @@ const SubirLibro: React.FC = () => {
         console.log("File uploaded successfully:", response.data);
         setDownloadUrl(response.data.url);
         setIsUploadSuccess(true); // Marcar como éxito si la carga fue exitosa
-
+        setLoadingPDF(false)
         return true;
       }
     } catch (error) {
       console.error("Error uploading file:", error);
       setIsUploadSuccess(false); // Marcar como fallo en caso de error
+      setLoadingPDF(false)
       return false;
     }
   };
-  // const handleUpload = () => {
-  //   if (!selectedFile) {
 
-  //     setIsPdfValid(false);
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append("file", selectedFile);
-
-  //   fetch("https://library-0a07.onrender.com/book/upload/", {
-  //     // Asegúrate de que la URL coincida con tu servidor
-  //     method: "POST",
-  //     body: formData,
-  //   })
-  //     .then((response) => response.text())
-  //     .then((data) => {
-  //       console.log("File uploaded successfully:", data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error uploading file:", error);
-  //     });
-  // };
   const resetForm = () => {
     setForm({
       name: '',
@@ -570,6 +551,11 @@ const SubirLibro: React.FC = () => {
           </div>
         </div>
         {isLoading && (
+          <div className="spinner-overlay">
+            <LoadingSpinner />
+          </div>
+        )}
+         {isLoadingPDF && (
           <div className="spinner-overlay">
             <LoadingSpinner />
           </div>

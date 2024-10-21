@@ -23,22 +23,38 @@ interface CardData {
     description: string;
 }
 
+interface UserData {
+    id: number;
+    first_name: string;
+    role_id: number;
+}
+
+
 const Libros: React.FC = () => {
     const [data, setData] = useState<CardData[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const location = useLocation();
-
-
-    // const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
 
 
+    const [userData, setUserData] = useState<UserData | null>(null);
 
     useEffect(() => {
-        fetchData(); // Llama a fetchData cada vez que cambia la ubicación
-    }, [location.pathname]); // Se ejecuta cuando la ruta cambia
+        const storedData = localStorage.getItem('userData');
+        if (storedData) {
+            setUserData(JSON.parse(storedData));
+        } else {
+            console.log("No se encontraron datos de usuario.");
+        }
+    }, []);
+
+    
+    const userRole = userData ? userData.role_id : null;
+    useEffect(() => {
+        fetchData();
+    }, [location.pathname]); 
 
     useEffect(() => {
         filterData();
@@ -64,7 +80,7 @@ const Libros: React.FC = () => {
         const newFilteredData = data.filter(item => {
             // Convertir publication_year a cadena si no lo es
             const publicationYearStr = item.publication_year.toString();
-    
+
             return (
                 item.name.toLowerCase().includes(lowercasedTerm) ||
                 item.author.toLowerCase().includes(lowercasedTerm) ||
@@ -87,22 +103,7 @@ const Libros: React.FC = () => {
         setIsErrorModalOpen(false);
     };
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await axios.get<CardData[]>('https://library-0a07.onrender.com/book/');
-    //             setData(response.data);
-    //             console.log(response.data); // Aquí ya es un objeto
-    //         } catch (error) {
-    //             console.error('Error fetching data:', error);
-    //             setIsErrorModalOpen(true)
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     fetchData();
-    // }, []);
+   
 
     return (
         <>
@@ -130,7 +131,7 @@ const Libros: React.FC = () => {
                         <LoadingSpinner />
                     ) : (
                         <>
-                             <div className="action-bar">
+                            <div className="action-bar">
                                 <div className="search-bar">
                                     <IonInput
                                         className="search-input text-font"
@@ -141,7 +142,7 @@ const Libros: React.FC = () => {
                                     <FontAwesomeIcon className="search-icon" icon={faSearch} />
                                 </div>
                                 <Link to="/subirlibro" className="no-underline">
-                                    <IonButton className="boton-agregar" style={{ textTransform: 'capitalize' }} color="medium" shape="round"  onClick={() => setSearchTerm('')}>
+                                    <IonButton className="boton-agregar" style={{ textTransform: 'capitalize' }} color="medium" shape="round" onClick={() => setSearchTerm('')}>
                                         <div className="text-font" style={{ textTransform: 'capitalize' }}>
                                             <FontAwesomeIcon style={{ paddingRight: '4px' }} icon={faCirclePlus} />
                                             Añadir libro
@@ -151,40 +152,35 @@ const Libros: React.FC = () => {
                             </div>
 
                             <IonGrid>
-                                
+
                                 <IonRow className='card-carreras'>
-                                    {/* {data.map((item) => (
-                                        <IonCol size="6" size-sm="6" size-md="4" size-lg="3" key={item.id}>
-                                            <IonCard className="espacios-cards clickable-card text-font">
-                                                <IonCardTitle style={{ textAlign: 'center', padding: '10px', fontSize: '16px' }}>{item.name}</IonCardTitle>
-                                                <IonCardContent>
-                                                    <IonText>
-                                                        <h3 style={{ fontSize: '11px' }}>Autor: {item.author}</h3>
-                                                        <p style={{ fontSize: '11px' }}>Año de publicación: {item.publication_year}</p>
-                                                    </IonText>
-                                                    <Link to={`/editarlibro/${item.id}`}>
-                                                        <button className="text-font">Editar</button>
-                                                    </Link>
-                                                </IonCardContent>
-                                            </IonCard>
-                                        </IonCol>
-                                    ))} */}
+                              
                                     {filteredData.map((item) => (
                                         <IonCol size="6" size-sm="6" size-md="4" size-lg="3" key={item.id}>
                                             <IonCard className="espacios-cards clickable-card text-font">
                                                 <IonCardTitle style={{ textAlign: 'center', padding: '10px', fontSize: '16px' }}>{item.name}</IonCardTitle>
                                                 <IonCardContent>
                                                     <IonText>
-                                                        <h3 style={{ fontSize: '11px' }}>Autor: {item.author}</h3>
-                                                        <p style={{ fontSize: '11px' }}>Año de publicación: {item.publication_year}</p>
-                                                        <p style={{ fontSize: '11px' }}>PNF: {item.pnf_id}</p>
+                                                        <h3 style={{ fontSize: '11px', color: 'black' }}>Autor: {item.author}</h3>
+                                                        <p style={{ fontSize: '11px', color: 'black' }}>Año de publicación: {item.publication_year}</p>
+                                                        <p style={{ fontSize: '11px', color: 'black' }}>PNF: {item.pnf_id}</p>
                                                     </IonText>
-                                                    <Link to={`/editarlibro/${item.id}`}>
-                                                        <button className="text-font">Editar</button>
-                                                    </Link>
-                                                    <Link to={`/verlibro/${item.id}`}>
-                                                        <button className="text-font">Ver libro</button>
-                                                    </Link>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+                                                        {userRole === 1 && (
+                                                            <Link to={`/editarlibro/${item.id}`}>
+                                                                <IonButton color='dark' size="small" style={{ textTransform: 'capitalize', fontSize: '10px' }} className="text-font">Editar</IonButton>
+                                                            </Link>
+                                                        )}
+                                                     
+                                                        <Link to={`/verlibro/${item.id}`}>
+
+                                                            <IonButton
+                                                                color='dark'
+                                                                size="small"
+                                                                style={{ textTransform: 'capitalize', fontSize: '10px' }}
+                                                                className="text-font">Ver libro</IonButton>
+                                                        </Link>
+                                                    </div>
                                                 </IonCardContent>
                                             </IonCard>
                                         </IonCol>
@@ -194,18 +190,7 @@ const Libros: React.FC = () => {
                         </>
                     )}
                 </div>
-                {/* <IonAlert
-                    className='text-font'
-                    isOpen={isErrorModalOpen}
-                    header="Error"
-                    message="Error al consultar. Por favor, intente de nuevo más tarde."
-                    buttons={[{
-                        text: 'Aceptar',
-                        handler: () => setIsErrorModalOpen(false)
-                    }]}
-                    onDidDismiss={() => setIsErrorModalOpen(false)}
-                    mode="ios"
-                /> */}
+              
                 <IonAlert
                     className='text-font'
                     isOpen={isErrorModalOpen}

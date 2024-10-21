@@ -1,13 +1,20 @@
 // src/PdfViewer.tsx
-import React from 'react';
+import React , { useEffect, useState } from 'react';
 import { IonContent, IonHeader, IonMenuButton, IonButtons, IonPage, IonTitle, IonToolbar, IonButton } from '@ionic/react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesLeft } from '@fortawesome/free-solid-svg-icons';
 import Drawer from './Drawer';
+import { useLocation } from 'react-router-dom';
 
-const PdfViewer: React.FC<{ pdfUrl: string }> = ({ pdfUrl }) => {
-    
+
+const PdfViewer: React.FC = () => {
+    const pdfUrl = localStorage.getItem('pdfUrl');
+
+    const resetVariable =()=>{
+        
+        localStorage.removeItem('pdfUrl')
+    }
     return (
         <>
             <Drawer />
@@ -22,10 +29,11 @@ const PdfViewer: React.FC<{ pdfUrl: string }> = ({ pdfUrl }) => {
                 </IonHeader>
                 <Link to="/libros" className="no-underline">
                     <IonButton
-
                         className="boton-volver"
                         shape="round"
                         color="medium"
+                        onClick={resetVariable}
+                       
 
                     >
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />

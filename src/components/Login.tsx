@@ -73,7 +73,7 @@ const Login: React.FC<LoginProps> = () => {
         console.log(response.data, "aqui respuesta");
         localStorage.setItem(
           "userData",
-          JSON.stringify({ id: user.id, first_name: user.first_name })
+          JSON.stringify({ id: user.id, first_name: user.first_name,role_id: user.role_id })
         );
         window.location.href = "/bienvenida";
       } catch (error) {
