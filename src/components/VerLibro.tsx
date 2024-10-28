@@ -21,7 +21,11 @@ interface PNF {
     name: string;
 }
 
-
+interface UserData {
+    id: number;
+    first_name: string;
+    role_id: number;
+}
 
 interface FormState {
     name: string;
@@ -38,6 +42,8 @@ const VerLibro: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
     const [isNetworkErrorModalOpen, setIsNetworkErrorModalOpen] = useState(false);
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const [form, setForm] = useState<FormState>({
@@ -56,6 +62,19 @@ const VerLibro: React.FC = () => {
     const history = useHistory();
     const { id } = useParams<{ id: string }>(); // ID del libro a visualizar
 
+    const [userData, setUserData] = useState<UserData | null>(null);
+
+    useEffect(() => {
+        const storedData = localStorage.getItem('userData');
+        if (storedData) {
+            setUserData(JSON.parse(storedData));
+        } else {
+            console.log("No se encontraron datos de usuario.");
+        }
+    }, []);
+
+
+    const userRole = userData ? userData.role_id : null;
 
     useEffect(() => {
         fetchData();
@@ -81,7 +100,7 @@ const VerLibro: React.FC = () => {
             console.log(form)
             console.log(bookTypes, "aqui")
             console.log('selected value:', form.book_type);
-            localStorage.setItem("pdfUrl",bookResponse.data.download_url)
+            localStorage.setItem("pdfUrl", bookResponse.data.download_url)
             setPdfUrl(bookResponse.data.download_url)
 
             setIsLoading(false);
@@ -110,11 +129,30 @@ const VerLibro: React.FC = () => {
         history.push('/libros'); // Redirige a la página de libros
     };
 
-    
-    const resetVariable =()=>{
-        
+
+    const resetVariable = () => {
+
         localStorage.removeItem('pdfUrl')
     }
+
+    const handleDelete = async () => {
+        setShowDeleteAlert(false); // Cierra el alert de confirmación
+        setIsLoading(true); // Muestra el loading
+        try {
+            await axios.delete(`https://library-0a07.onrender.com/book/${id}/`);
+            setIsLoading(false); // Oculta el loading
+            setShowSuccessAlert(true); // Muestra el alert de éxito
+        } catch (error) {
+            console.error('Error deleting book:', error);
+            setIsLoading(false); // Oculta el loading
+            alert("Error al intentar borrar el libro. Por favor, intente de nuevo más tarde.");
+        }
+    };
+
+    const handleSuccessAlertClose = () => {
+        setShowSuccessAlert(false); // Cierra el alert de éxito
+        history.push('/libros'); // Redirige a la página de libros
+    };
 
     return (
         <>
@@ -125,7 +163,7 @@ const VerLibro: React.FC = () => {
                         <IonButtons slot="start">
                             <IonMenuButton></IonMenuButton>
                         </IonButtons>
-                        <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
+                        <IonTitle className='text-font'>Biblioteca Digital</IonTitle>
                     </IonToolbar>
                 </IonHeader>
                 <Link to="/libros" className="no-underline">
@@ -195,21 +233,7 @@ const VerLibro: React.FC = () => {
                                                     />
                                                 </div>
                                             </IonCol>
-                                            {/* <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
-                                                <div>
-                                                    <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Adjuntar libro</span>
-                                                    <IonInput
-                                                        type="text"
-                                                        className="text-font inputs-datos-usuario"
-                                                        placeholder="Adjuntar archivo"
-                                                        name="download_url"
-                                                        value={form.download_url}
-                                                        disabled
-                                                        style={{ backgroundColor: 'white', color: 'black', opacity: 1, cursor: 'not-allowed' }}
 
-                                                    />
-                                                </div>
-                                            </IonCol> */}
                                             <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Tipo</span>
@@ -302,6 +326,22 @@ const VerLibro: React.FC = () => {
                                                 Cerrar
                                             </IonButton>
                                         </div>
+
+                                        {userRole === 1 && (
+
+                                            <div style={{ textAlign: 'center', paddingTop: '25px' }}>
+
+                                                <IonButton
+                                                    color="danger"
+                                                    onClick={() => setShowDeleteAlert(true)} // Abre el alert de confirmación
+                                                    style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px', marginLeft: '10px' }}
+                                                    className="text-font"
+                                                >
+                                                    Eliminar
+                                                </IonButton>
+                                            </div>
+                                        )}
+
                                     </form>
                                 </IonCardContent>
                             </IonCard>
@@ -354,6 +394,37 @@ const VerLibro: React.FC = () => {
                         }
                     ]}
                     onDidDismiss={() => setIsNetworkErrorModalOpen(false)}
+                    mode="ios"
+                />
+
+                <IonAlert
+                    className='text-font'
+                    isOpen={showDeleteAlert}
+                    onDidDismiss={() => setShowDeleteAlert(false)}
+                    header={'Confirmar Eliminación'}
+                    message={'¿Está seguro de que desea eliminar este libro?'}
+                    buttons={[
+                        {
+                            text: 'Cancelar',
+                            role: 'cancel',
+                        },
+                        {
+                            text: 'Eliminar',
+                            handler: handleDelete, // Llama a la función de eliminación
+                        }
+                    ]}
+                    mode="ios"
+                />
+                <IonAlert
+                    className='text-font'
+                    isOpen={showSuccessAlert}
+                    onDidDismiss={handleSuccessAlertClose}
+                    header={'Éxito'}
+                    message={'Libro borrado con éxito.'}
+                    buttons={[{
+                        text: 'Aceptar',
+                        handler: handleSuccessAlertClose // Redirige al cerrar
+                    }]}
                     mode="ios"
                 />
             </IonPage>

@@ -29,7 +29,7 @@ const Drawer: React.FC = () => {
             <IonMenu contentId="main-content" isOpen={isOpen} >
                 <IonHeader>
                     <IonToolbar color="dark">
-                        <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
+                        <IonTitle className='text-font'>Biblioteca Digital</IonTitle>
                     </IonToolbar>
                 </IonHeader>
 

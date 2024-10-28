@@ -15,7 +15,7 @@ function Vision() {
                         <IonButtons slot="start">
                             <IonMenuButton></IonMenuButton>
                         </IonButtons>
-                        <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
+                        <IonTitle className='text-font'>Biblioteca Digital</IonTitle>
                     </IonToolbar>
                 </IonHeader>
                 <Link to="/menu" className="no-underline">

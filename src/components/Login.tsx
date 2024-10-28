@@ -26,6 +26,7 @@ interface FormState {
 const Login: React.FC<LoginProps> = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<FormState>({
     email: "",
@@ -47,43 +48,94 @@ const Login: React.FC<LoginProps> = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({ email: null, password: null });
+    setErrorMessage(null); // Resetea el mensaje de error
 
     let hasError = false;
     if (!form.email) {
-      setErrors((prev) => ({ ...prev, email: "El correo es obligatorio." }));
-      hasError = true;
+        setErrors((prev) => ({ ...prev, email: "El correo es obligatorio." }));
+        hasError = true;
     }
     if (!form.password) {
-      setErrors((prev) => ({
-        ...prev,
-        password: "La contraseña es obligatoria.",
-      }));
-      hasError = true;
+        setErrors((prev) => ({
+            ...prev,
+            password: "La contraseña es obligatoria.",
+        }));
+        hasError = true;
     }
 
     if (!hasError) {
-      setIsLoading(true);
-      try {
-        const response = await axios.post(
-          "https://library-0a07.onrender.com/user/login",
-          form
-        );
+        setIsLoading(true);
+        try {
+            const response = await axios.post(
+                "https://library-0a07.onrender.com/user/login",
+                form
+            );
 
-        const { user } = response.data;
-        console.log(response.data, "aqui respuesta");
-        localStorage.setItem(
-          "userData",
-          JSON.stringify({ id: user.id, first_name: user.first_name,role_id: user.role_id })
-        );
-        window.location.href = "/bienvenida";
-      } catch (error) {
-        console.error("Error en el inicio de sesión", error);
-        setIsErrorModalOpen(true);
-      } finally {
-        setIsLoading(false); // Ocultar el spinner
-      }
+            const { user } = response.data;
+            console.log(response.data, "aqui respuesta");
+            localStorage.setItem(
+                "userData",
+                JSON.stringify({ id: user.id, first_name: user.first_name, role_id: user.role_id })
+            );
+            window.location.href = "/bienvenida";
+        } catch (error) {
+            console.error("Error en el inicio de sesión", error);
+            setIsErrorModalOpen(true)
+            // Manejo de errores
+            if (axios.isAxiosError(error) && error.response) {
+               
+                const message = error.response.data.detail || "Error desconocido";
+                setErrorMessage(message)
+                
+            } else {
+                setErrorMessage("Ocurrió un error desconocido.");
+            }
+        } finally {
+            setIsLoading(false); // Ocultar el spinner
+        }
     }
-  };
+};
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setErrors({ email: null, password: null });
+
+  //   let hasError = false;
+  //   if (!form.email) {
+  //     setErrors((prev) => ({ ...prev, email: "El correo es obligatorio." }));
+  //     hasError = true;
+  //   }
+  //   if (!form.password) {
+  //     setErrors((prev) => ({
+  //       ...prev,
+  //       password: "La contraseña es obligatoria.",
+  //     }));
+  //     hasError = true;
+  //   }
+
+  //   if (!hasError) {
+  //     setIsLoading(true);
+  //     try {
+  //       const response = await axios.post(
+  //         "https://library-0a07.onrender.com/user/login",
+  //         form
+  //       );
+
+  //       const { user } = response.data;
+  //       console.log(response.data, "aqui respuesta");
+  //       localStorage.setItem(
+  //         "userData",
+  //         JSON.stringify({ id: user.id, first_name: user.first_name,role_id: user.role_id })
+  //       );
+  //       window.location.href = "/bienvenida";
+  //     } catch (error) {
+  //       console.error("Error en el inicio de sesión", error);
+  //       setIsErrorModalOpen(true);
+  //     } finally {
+  //       setIsLoading(false); // Ocultar el spinner
+  //     }
+  //   }
+  // };
   const togglePasswordVisibility = (e: React.MouseEvent) => {
     e.stopPropagation(); // Previene la propagación del evento
     setShowPassword((prev) => !prev);
@@ -250,7 +302,7 @@ const Login: React.FC<LoginProps> = () => {
         className="text-font"
         isOpen={isErrorModalOpen}
         header="Error"
-        message="No se pudo iniciar sesión. Por favor, intente de nuevo más tarde."
+        message={errorMessage}
         buttons={[
           {
             text: "Aceptar",

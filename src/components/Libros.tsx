@@ -52,6 +52,7 @@ const Libros: React.FC = () => {
 
     
     const userRole = userData ? userData.role_id : null;
+    
     useEffect(() => {
         fetchData();
     }, [location.pathname]); 
@@ -114,7 +115,7 @@ const Libros: React.FC = () => {
                         <IonButtons slot="start">
                             <IonMenuButton></IonMenuButton>
                         </IonButtons>
-                        <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
+                        <IonTitle className='text-font'>Biblioteca Digital</IonTitle>
                     </IonToolbar>
                 </IonHeader>
                 <Link to="/bienvenida" className="no-underline">

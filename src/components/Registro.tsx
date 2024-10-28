@@ -53,11 +53,6 @@ const Register: React.FC = () => {
   const [message, setMessage] = useState<string>("");
 
   // Maneja el cambio de los campos del formulario
-  // const handleChange = (e: CustomEvent) => {
-  //   const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-  //   const { name, value } = target;
-  //   setForm((prevForm) => ({ ...prevForm, [name]: value })); // Actualiza el estado
-  // };
 
   const handleChange = (e: CustomEvent) => {
     const target = e.target as HTMLInputElement;
@@ -132,8 +127,7 @@ const Register: React.FC = () => {
   const handleModalClose = () => {
     setIsModalOpen(false); // Cierra el modal
     history.push({
-      pathname: "/bienvenida", // La ruta a la que deseas redirigir
-      state: { userData }, // Envía los datos del usuario
+      pathname: "/login"
     });
   };
 
@@ -267,39 +261,6 @@ const Register: React.FC = () => {
                 )}
               </div>
 
-              {/* 
-              <div style={{ marginBottom: '12px' }}>
-                <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Contraseña</span>
-                <IonInput
-                  name="password"
-                  className={`text-font inputs-datos-usuario ${formErrors.password ? 'error-input' : ''}`}
-                  value={form.password}
-                  onIonChange={handleChange}
-                  placeholder="Contraseña"
-                  type="password"
-                ></IonInput>
-                {formErrors.password && <div className="error-message">{formErrors.password}</div>}
-                <IonInput
-                  className={`text-font inputs-datos-usuario ${form.password ? 'error-input' : ''}`}
-                  name="password"
-                  value={form.password}
-                  onIonInput={handleChange}
-                  placeholder="Contraseña"
-                  type={showPassword ? "text" : "password"}
-                  style={{ textAlign: 'center', fontSize: '16px', padding: '8px', border: 'none', background: 'transparent', width: '100%' }}
-                />
-
-                <button
-                  onClick={togglePasswordVisibility}
-                  style={{ zIndex: 1000, position: 'absolute', right: '10px', top: '36%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
-                  onMouseDown={(e) => e.preventDefault()} // Previene el efecto de enfoque del input
-                >
-                  <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
-                </button>
-                <div style={{ height: '20px', textAlign: 'center' }}>
-                {formErrors.password && <div className="error-message">{formErrors.password}</div>}
-                </div>
-              </div> */}
 
               <div style={{ position: "relative", marginBottom: "12px" }}>
                 <span
@@ -375,10 +336,10 @@ const Register: React.FC = () => {
                   onIonChange={handleChange}
                   placeholder="Selecciona un rol"
                 >
-                  <IonSelectOption value="Estudiante">
+                  <IonSelectOption className="text-font" value="Estudiante">
                     Estudiante
                   </IonSelectOption>
-                  <IonSelectOption value="Profesor">Profesor</IonSelectOption>
+                  <IonSelectOption className="text-font" value="Profesor">Profesor</IonSelectOption>
                 </IonSelect>
                 {formErrors.user_type && (
                   <div className="error-message">{formErrors.user_type}</div>

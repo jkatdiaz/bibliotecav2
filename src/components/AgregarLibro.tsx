@@ -167,7 +167,7 @@ const SubirLibro: React.FC = () => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     history.push("/libros"); // Redirige a la página de libros
-    
+
   };
 
 
@@ -237,7 +237,7 @@ const SubirLibro: React.FC = () => {
     setDownloadUrl("");
     setIsPdfValid(true);
     setIsUploadSuccess(false);
-    
+
   };
   return (
     <>
@@ -248,7 +248,7 @@ const SubirLibro: React.FC = () => {
             <IonButtons slot="start">
               <IonMenuButton></IonMenuButton>
             </IonButtons>
-            <IonTitle className="text-font">Biblioteca Virtual</IonTitle>
+            <IonTitle className="text-font">Biblioteca Digital</IonTitle>
           </IonToolbar>
         </IonHeader>
         <Link to="/libros" className="no-underline">
@@ -555,7 +555,7 @@ const SubirLibro: React.FC = () => {
             <LoadingSpinner />
           </div>
         )}
-         {isLoadingPDF && (
+        {isLoadingPDF && (
           <div className="spinner-overlay">
             <LoadingSpinner />
           </div>

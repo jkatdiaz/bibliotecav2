@@ -35,11 +35,18 @@ const EditarLibro: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    const [isLoadingPDF, setLoadingPDF] = useState(false)
     const [isNetworkErrorModalOpen, setIsNetworkErrorModalOpen] = useState(false);
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
     const [bookTypes, setBookTypes] = useState<BookType[]>([]);
     const [isPdfValid, setIsPdfValid] = useState(true);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    const [bookName, setBookName] = useState<string>(''); // Nombre del libro desde el servicio
+    const [showInput, setShowInput] = useState<boolean>(false);
+    const [showAlert, setShowAlert] = useState<boolean>(false);
+    const [showButtonUpdate, setShowButtonUpdate]=useState<boolean>(true)
+    const [isUploadSuccess, setIsUploadSuccess] = useState(false)
     const [downloadUrl, setDownloadUrl] = useState<string>("");
     const [pnfs, setPnfs] = useState<PNF[]>([]);
     const [form, setForm] = useState<FormState>({
@@ -54,13 +61,29 @@ const EditarLibro: React.FC = () => {
     });
 
     const history = useHistory();
-    const { id } = useParams<{ id: string }>(); // ID del libro a editar
+    const { id } = useParams<{ id: string }>();
+
 
 
     useEffect(() => {
-
         fetchData();
-    }, [id]);
+    }, [id]); // Dependencia en el ID
+
+    const clearForm = () => {
+
+        setIsModalOpen(false);
+        setIsLoading(false);
+        setIsErrorModalOpen(false);
+        setIsNetworkErrorModalOpen(false);
+        setFormErrors({});
+        setIsPdfValid(true);
+        setSelectedFile(null);
+        setBookName('');
+        setShowInput(false);
+        setShowAlert(false);
+        setDownloadUrl('');
+
+    };
 
 
     const fetchData = async () => {
@@ -84,12 +107,21 @@ const EditarLibro: React.FC = () => {
 
             // Fetch book details for editing
             const bookResponse = await axios.get<FormState>(`https://library-0a07.onrender.com/book/${id}/`);
-            setForm(bookResponse.data);
+            const { book_type, ...bookDetails } = bookResponse.data;
 
+
+            const { download_url } = bookResponse.data; // Ajusta según la estructura de tu respuesta
+
+            setBookName(download_url); // Guardar la URL directamente
+
+            // Extraer el nombre del archivo de la URL
+            const name = download_url.substring(download_url.lastIndexOf('/') + 1);
+            setBookName(name); // Actualiza con el nombre extraído
 
             setForm({
-                ...bookResponse.data,
-                user_id: Number(user_id), // Asegúrate de convertirlo a número
+                ...bookDetails,
+                book_type_id: bookTypesResponse.data.find(type => type.name === book_type)?.id || 0, // Obtener el ID del tipo
+                user_id: Number(user_id),
             });
 
 
@@ -101,7 +133,20 @@ const EditarLibro: React.FC = () => {
 
         }
     };
+    const handleEditPdf = () => {
+        setShowAlert(true); // Muestra el alerta
+    };
 
+    const handleConfirmEdit = () => {
+        setShowInput(true); // Muestra el input para el archivo
+        setShowAlert(false);
+        setShowButtonUpdate(false)
+    };
+
+    const handleCancelEdit = () => {
+        setShowAlert(false);
+        setShowButtonUpdate(true)
+    };
 
     const handleChange = (e: CustomEvent) => {
         const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
@@ -116,8 +161,6 @@ const EditarLibro: React.FC = () => {
         }));
     };
 
-
-
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file && file.type === "application/pdf") {
@@ -130,7 +173,7 @@ const EditarLibro: React.FC = () => {
         }
     };
 
-
+    console.log(form)
 
     const handleUpload = async () => {
         if (!selectedFile) {
@@ -140,7 +183,7 @@ const EditarLibro: React.FC = () => {
 
         const formData = new FormData();
         formData.append("file", selectedFile);
-
+        setLoadingPDF(true)
         try {
             const response = await axios.post(
                 "https://library-0a07.onrender.com/book/upload/",
@@ -149,24 +192,27 @@ const EditarLibro: React.FC = () => {
             if (response.data) {
                 console.log("File uploaded successfully:", response.data);
                 setDownloadUrl(response.data.url);
-
-
+                setIsUploadSuccess(true);
+                setShowButtonUpdate(true)
+                setLoadingPDF(false)
                 return true;
             }
         } catch (error) {
             console.error("Error uploading file:", error);
+            setLoadingPDF(false)
+            setShowButtonUpdate(true)
             return false;
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
+        console.log('¡El botón se ha presionado!');
         // Verifica que todos los campos estén llenos
         const errors: { [key: string]: string } = {};
         if (!form.name) errors.name = 'Este campo es obligatorio';
         if (!form.publication_year) errors.publication_year = 'Este campo es obligatorio';
         if (!form.author) errors.author = 'Este campo es obligatorio';
-        if (!form.download_url) errors.download_url = 'Este campo es obligatorio';
+        // if (!selectedFile ) errors.download_url = "Adjuntar PDF es obligatorio";
         if (!form.book_type_id) errors.book_type_id = 'Este campo es obligatorio';
         if (!form.pnf_id) errors.pnf_id = 'Este campo es obligatorio';
         if (!form.description) errors.description = 'Este campo es obligatorio';
@@ -175,15 +221,22 @@ const EditarLibro: React.FC = () => {
             setFormErrors(errors);
             return;
         }
+
+        const updatedForm = {
+            ...form,
+            download_url: downloadUrl, // Asegúrate de que downloadUrl tenga un valor válido
+        };
+
         setIsLoading(true)
 
         try {
-            const response = await axios.put(`https://library-0a07.onrender.com/book/${id}/`, form);
+            const response = await axios.put(`https://library-0a07.onrender.com/book/${id}/`, updatedForm);
             if (response.data) {
                 setIsModalOpen(true); // Abre el modal si la respuesta es exitosa
-              
+
             } else {
                 console.error('Error updating the book');
+                debugger
                 setIsErrorModalOpen(true)
             }
         } catch (error) {
@@ -197,6 +250,7 @@ const EditarLibro: React.FC = () => {
     const handleModalClose = () => {
         setIsModalOpen(false);
         history.push('/libros'); // Redirige a la página de libros
+        clearForm()
 
     };
 
@@ -212,7 +266,7 @@ const EditarLibro: React.FC = () => {
         setIsNetworkErrorModalOpen(false); // Just close the modal
     };
 
-  
+
 
 
     return (
@@ -224,7 +278,7 @@ const EditarLibro: React.FC = () => {
                         <IonButtons slot="start">
                             <IonMenuButton></IonMenuButton>
                         </IonButtons>
-                        <IonTitle className='text-font'>Biblioteca Virtual</IonTitle>
+                        <IonTitle className='text-font'>Biblioteca Digital</IonTitle>
                     </IonToolbar>
                 </IonHeader>
                 <Link to="/libros" className="no-underline">
@@ -234,7 +288,8 @@ const EditarLibro: React.FC = () => {
                         color="medium"
                         onClick={() => {
                             setFormErrors({}); // Limpiar los errores del formulario
-                        
+                            clearForm()
+
                         }}
                     >
                         <FontAwesomeIcon style={{ padding: '4px' }} icon={faAnglesLeft} />
@@ -251,7 +306,7 @@ const EditarLibro: React.FC = () => {
                         <div className="text-font card-datos-usuario">
                             <IonCard className='carddos-datos-usuario'>
                                 <IonCardContent>
-                                    <form onSubmit={handleSubmit}>
+                                    <form >
                                         <IonRow>
                                             <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
@@ -295,20 +350,7 @@ const EditarLibro: React.FC = () => {
                                                     {formErrors.author && <div className="error-message">{formErrors.author}</div>}
                                                 </div>
                                             </IonCol>
-                                            <IonCol size="12" size-sm="6" size-md="4" size-lg="3">
-                                                <div>
-                                                    <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Adjuntar libro</span>
-                                                    <IonInput
-                                                        type="text"
-                                                        className={`text-font inputs-datos-usuario ${formErrors.download_url ? 'error-input' : ''}`}
-                                                        placeholder="Adjuntar archivo"
-                                                        name="download_url"
-                                                        value={form.download_url}
-                                                        onIonChange={handleChange}
-                                                    />
-                                                    {formErrors.download_url && <div className="error-message">{formErrors.download_url}</div>}
-                                                </div>
-                                            </IonCol>
+
                                             <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                                                 <div>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>Tipo</span>
@@ -321,13 +363,15 @@ const EditarLibro: React.FC = () => {
                                                         onIonChange={handleChange}
                                                         mode="ios"
                                                     >
-                                                        {bookTypes.map(type => (
+                                                        {bookTypes && bookTypes.map(type => (
                                                             <IonSelectOption className="text-font" key={type.id} value={type.id}>{type.name}</IonSelectOption>
                                                         ))}
+
                                                     </IonSelect>
                                                     {formErrors.book_type_id && <div className="error-message">{formErrors.book_type_id}</div>}
                                                 </div>
                                             </IonCol>
+
                                             <IonCol size="6" size-sm="6" size-md="4" size-lg="3">
                                                 <div style={{ textAlign: 'center' }}>
                                                     <span className='text-font' style={{ textAlign: 'center', color: 'black', fontWeight: '500', fontSize: '13px' }}>PNF</span>
@@ -373,39 +417,58 @@ const EditarLibro: React.FC = () => {
                                                 >
                                                     Adjuntar PDF
                                                 </span>
-                                                <IonItem className="text-font bg-white">
-                                                    <input
-                                                        className="text-font bg-white"
-                                                        style={{ fontSize: '12px' }}
-                                                        type="file"
-                                                        accept="application/pdf"
-                                                        onChange={handleFileChange}
-                                                    />
-                                                </IonItem>
-                                                {!isPdfValid && <div className="error-message">Adjuntar PDF es obligatorio.</div>} {/* Mensaje de error */}
-                                                <div style={{ textAlign: "center" }}>
-                                                    <IonButton
-                                                        color="dark"
+                                                {!showInput && (
+                                                    <IonItem>
+                                                        <IonInput
+                                                            value={bookName}
+                                                            readonly
+                                                            style={{ fontSize: '12px' }}
+                                                        />
+                                                        <IonButton style={{ textTransform: 'capitalize' }} onClick={handleEditPdf}>Editar PDF</IonButton>
+                                                    </IonItem>
+                                                )}
+                                                {showInput && (
+                                                    <IonItem className="text-font bg-white">
+                                                        <input
+                                                            className="text-font bg-white"
+                                                            style={{ fontSize: '12px' }}
+                                                            type="file"
+                                                            accept="application/pdf"
+                                                            onChange={handleFileChange}
+                                                        />
+                                                    </IonItem>
+                                                )}
 
-                                                        style={{
-                                                            borderRadius: "10px",
-                                                            textTransform: "capitalize",
-                                                            fontSize: "13px",
-                                                        }}
-                                                        className="text-font"
-                                                        onClick={handleUpload}
+                                                {!isPdfValid && (
+                                                    <div className="error-message">Adjuntar PDF es obligatorio.</div>
+                                                )} {/* Mensaje de error */}
 
-                                                    >
-                                                        Cargar
-                                                    </IonButton>
-                                                </div>
+                                                {showInput && (
+                                                    <div style={{ textAlign: "center" }}>
+                                                        <IonButton
+                                                            color="dark"
+                                                            style={{
+                                                                borderRadius: "10px",
+                                                                textTransform: "capitalize",
+                                                                fontSize: "13px",
+                                                            }}
+                                                            className="text-font"
+                                                            onClick={handleUpload}
+                                                            disabled={!selectedFile}
+                                                        >
+                                                            Cargar
+                                                        </IonButton>
+                                                    </div>
+                                                )}
                                             </IonCol>
                                         </IonRow>
+                                        
                                         <div style={{ textAlign: 'center' }}>
                                             <IonButton
+                                           
                                                 color="secondary"
-
-                                                type="submit"
+                                                onClick={() => handleSubmit()}
+                                               disabled={!showButtonUpdate}
                                                 style={{ borderRadius: '10px', textTransform: "capitalize", fontSize: '13px' }}
                                                 className="text-font"
                                             >
@@ -423,11 +486,16 @@ const EditarLibro: React.FC = () => {
                         <LoadingSpinner />
                     </div>
                 )}
+                {isLoadingPDF && (
+                    <div className="spinner-overlay">
+                        <LoadingSpinner />
+                    </div>
+                )}
                 <IonAlert
                     className='text-font'
                     isOpen={isModalOpen}
                     header="Éxito"
-                    message="Su libro ha sido añadido con éxito."
+                    message="Su libro ha sido actualizado con éxito."
                     buttons={[{
                         text: 'Aceptar',
                         handler: handleModalClose
@@ -465,6 +533,24 @@ const EditarLibro: React.FC = () => {
                     ]}
                     onDidDismiss={() => setIsNetworkErrorModalOpen(false)}
                     mode="ios"
+                />
+                <IonAlert
+                    isOpen={showAlert}
+                    className='text-font'
+                    onDidDismiss={() => setShowAlert(false)}
+                    header={'Editar PDF'}
+                    message={'¿Estás seguro de que deseas editar el PDF?'}
+                    buttons={[
+                        {
+                            text: 'Cancelar',
+                            role: 'cancel',
+                            handler: handleCancelEdit,
+                        },
+                        {
+                            text: 'Aceptar',
+                            handler: handleConfirmEdit,
+                        },
+                    ]}
                 />
             </IonPage>
         </>
