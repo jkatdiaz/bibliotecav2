@@ -59,7 +59,66 @@ const Register: React.FC = () => {
     const { name, value } = target;
     setForm((prevForm) => ({ ...prevForm, [name]: value })); // Actualiza el estado
   };
-  // Maneja el envío del formulario
+  // // Maneja el envío del formulario
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   // Verifica que todos los campos estén llenos
+  //   const errors: { [key: string]: string } = {};
+  //   if (!form.first_name) errors.first_name = "Este campo es obligatorio";
+  //   if (!form.last_name) errors.last_name = "Este campo es obligatorio";
+  //   if (!form.email) errors.email = "Este campo es obligatorio";
+  //   if (!form.password) errors.password = "Este campo es obligatorio";
+  //   if (!form.user_type) errors.user_type = "Seleccione un rol";
+
+  //   if (Object.keys(errors).length > 0) {
+  //     setFormErrors(errors);
+  //     return;
+  //   }
+
+  //   await fetchData(); // Llama a la función para enviar la solicitud
+  // };
+
+  // // Función para enviar la solicitud
+  // const fetchData = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     // add headers
+  //     const config = {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     };
+
+  //     const response = await axios.post(
+  //       "https://library-0a07.onrender.com/user/",
+  //       form,
+  //       config
+  //     );
+
+  //     if (response.data) {
+  //       const { user } = response.data;
+  //       localStorage.setItem(
+  //         "userData",
+  //         JSON.stringify({ id: user.id, first_name: user.first_name })
+  //       );
+
+  //       setIsModalOpen(true); //e el modal si la respuesta es exitosa
+  //     } else {
+  //       console.error("Error al registrarse");
+  //       setIsErrorModalOpen(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error en la solicitud:", error);
+  //     setMessage(
+  //       "No se pudo registrar. Por favor, intente de nuevo más tarde: " + error
+  //     );
+  //     setIsErrorModalOpen(true);
+  //   } finally {
+  //     setIsLoading(false); // Oculta el spinner
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -72,52 +131,71 @@ const Register: React.FC = () => {
     if (!form.user_type) errors.user_type = "Seleccione un rol";
 
     if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
+        setFormErrors(errors);
+        return;
     }
 
-    await fetchData(); // Llama a la función para enviar la solicitud
-  };
+    // Llama a la función para enviar la solicitud
+    await fetchData(); 
+};
 
-  // Función para enviar la solicitud
-  const fetchData = async () => {
+// Función para enviar la solicitud
+const fetchData = async () => {
     setIsLoading(true);
     try {
-      // add headers
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
+        // add headers
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
 
-      const response = await axios.post(
-        "https://library-0a07.onrender.com/user/",
-        form,
-        config
-      );
-
-      if (response.data) {
-        const { user } = response.data;
-        localStorage.setItem(
-          "userData",
-          JSON.stringify({ id: user.id, first_name: user.first_name })
+        const response = await axios.post(
+            "https://library-0a07.onrender.com/user/",
+            form,
+            config
         );
 
-        setIsModalOpen(true); //e el modal si la respuesta es exitosa
-      } else {
-        console.error("Error al registrarse");
-        setIsErrorModalOpen(true);
-      }
+        if (response.data) {
+            const { user } = response.data;
+            localStorage.setItem(
+                "userData",
+                JSON.stringify({ id: user.id, first_name: user.first_name })
+            );
+
+            setIsModalOpen(true); // Abre el modal si la respuesta es exitosa
+        } else {
+            console.error("Error al registrarse");
+            setIsErrorModalOpen(true);
+        }
     } catch (error) {
-      console.error("Error en la solicitud:", error);
-      setMessage(
-        "No se pudo registrar. Por favor, intente de nuevo más tarde: " + error
-      );
-      setIsErrorModalOpen(true);
+        console.error("Error en la solicitud:", error);
+        
+        // Manejo de errores de Axios
+        if (axios.isAxiosError(error)) {
+            // Si es un error de Axios
+            if (error.response) {
+                // Respuesta del servidor con un código de error
+                const message = error.response.data.detail || "Error desconocido";
+                setMessage(message); // Mostrar el mensaje del servidor
+            } else if (error.request) {
+                // La solicitud fue hecha pero no se recibió respuesta
+                setMessage("No se recibió respuesta del servidor.");
+            } else {
+                // Ocurrió un error al configurar la solicitud
+                setMessage("Error al realizar la solicitud: " + error.message);
+            }
+        } else {
+            // Manejo de errores desconocidos
+            setMessage("Ocurrió un error desconocido.");
+        }
+        
+        setIsErrorModalOpen(true); // Abre el modal de error
     } finally {
-      setIsLoading(false); // Oculta el spinner
+        setIsLoading(false); // Oculta el spinner
     }
-  };
+};
+
   // Maneja el cierre del modal de éxito
   const togglePasswordVisibility = (e: React.MouseEvent) => {
     e.stopPropagation(); // Evita que el evento se propague

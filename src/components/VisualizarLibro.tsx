@@ -226,8 +226,8 @@ const PdfViewer: React.FC = () => {
               <IonButton color='dark'
                   size="small"
                   style={{ textTransform: 'capitalize', fontSize: '10px', paddingLeft:'15px' }}
-                  className="text-font" onClick={downloadPdf} >
-                <FontAwesomeIcon icon={faDownload} /> Descargar PDF
+                  className="text-font" onClick={downloadPdf} disabled={isLoading}>
+                <FontAwesomeIcon icon={faDownload}  /> Descargar PDF
               </IonButton>
               <div style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                 <IonInput
@@ -240,7 +240,9 @@ const PdfViewer: React.FC = () => {
                 <IonButton onClick={goToPage} color='dark'
                   size="small"
                   style={{ textTransform: 'capitalize', fontSize: '10px' }}
-                  className="text-font">
+                  className="text-font"
+                  disabled={isLoading}>
+                    
                   Ir a Página
                 </IonButton>
               </div>

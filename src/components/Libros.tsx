@@ -54,14 +54,14 @@ const Libros: React.FC = () => {
     const userRole = userData ? userData.role_id : null;
     
     useEffect(() => {
-        fetchData();
+        fetchDataLibros();
     }, [location.pathname]); 
 
     useEffect(() => {
         filterData();
     }, [searchTerm, data]);
 
-    const fetchData = async () => {
+    const fetchDataLibros = async () => {
         setLoading(true);
         try {
             const response = await axios.get('https://library-0a07.onrender.com/book/');

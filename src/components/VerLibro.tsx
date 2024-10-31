@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import axios from "axios";
 import {
   IonHeader,
@@ -94,11 +94,94 @@ const VerLibro: React.FC = () => {
 
   const userRole = userData ? userData.role_id : null;
 
-  useEffect(() => {
-    fetchData();
-  }, [id, location.pathname]);
+  // useEffect(() => {
+  //   fetchData();
+  // }, [location.pathname]);
+  
+  const prevIdRef = useRef(null);
 
-  const fetchData = async () => {
+  // useEffect(() => {
+  //   // Extrae el ID desde el pathname
+  //   const currentPath = history.location.pathname;
+  //   const id = currentPath.split('/').pop(); // Supone que el id es el último segmento de la ruta
+
+  //   // Ejecuta el código solo si el id ha cambiado
+  //   if (prevIdRef.current !== id) {
+  //     console.log(`El ID ha cambiado a ${id}`);
+  //     fetchData(id); // Llama a tu función para obtener los datos
+  //     prevIdRef.current = id; // Actualiza el id en el ref
+  //   }
+  // }, [history.location.pathname]); // Se ejecuta cuando cambia el pathname
+
+  // useEffect(() => {
+  //   // Extrae el ID desde el pathname
+  //   const currentPath = location.pathname;
+  //   const pathSegments = currentPath.split('/');
+  //   const id = pathSegments[pathSegments.length - 1]; // Asume que el ID es el último segmento
+
+  //   // Lista de rutas que no deben ser consideradas como ID
+  //   const invalidIds = [
+  //     'register',
+  //     'menu',
+  //     'valores',
+  //     'carreras',
+  //     'mision',
+  //     'vision',
+  //     'reseña',
+  //     'objetivos',
+  //     'bienvenida',
+  //     'perfilusuario',
+  //     'libros',
+  //     'subirlibro',
+  //     'visualizarlibro'
+  //   ];
+
+  //   // Verifica que el id sea válido (no vacío y no en la lista de IDs inválidos)
+  //   const isValidId = id && !invalidIds.includes(id);
+
+  //   // Ejecuta fetchData solo si el ID ha cambiado y es válido
+  //   if (isValidId && prevIdRef.current !== id) {
+  //     console.log(`El ID ha cambiado a ${id}`);
+  //     fetchData(id); // Llama a tu función para obtener los datos
+  //     prevIdRef.current = id; // Actualiza el ref con el nuevo ID
+  //   }
+  // }, [id, location.pathname]); // Escucha cambios en el pathname
+  useEffect(() => {
+    // Extrae el ID desde el pathname
+    const currentPath = location.pathname;
+    const pathSegments = currentPath.split('/');
+    const id = pathSegments[pathSegments.length - 1]; // Asume que el ID es el último segmento
+
+    // Lista de rutas que no deben ser consideradas como ID
+    const invalidIds = [
+      'register',
+      'menu',
+      'valores',
+      'carreras',
+      'mision',
+      'vision',
+      'reseña',
+      'objetivos',
+      'bienvenida',
+      'perfilusuario',
+      'libros',
+      'subirlibro',
+      'visualizarlibro',
+      'login',
+      'register'
+    ];
+
+    // Verifica que el id sea válido (no vacío y no en la lista de IDs inválidos)
+    const isValidId = id && !invalidIds.includes(id);
+
+    // Si el id es válido, llama a fetchData
+    if (isValidId) {
+      console.log(`Consultando el libro con ID: ${id}`);
+      fetchData(id); // Llama a tu función para obtener los datos
+    }
+  }, [location.pathname]); // Escucha cambios en el pathname
+
+  const fetchData = async (id) => {
     setIsLoading(true);
     try {
       // Fetch book types
@@ -140,7 +223,7 @@ const VerLibro: React.FC = () => {
 
   const handleRetry = async () => {
     setIsNetworkErrorModalOpen(false); // Close the error modal
-    await fetchData(); // Retry fetching data
+    await fetchData(id); // Retry fetching data
   };
 
   const handleCancel = () => {
