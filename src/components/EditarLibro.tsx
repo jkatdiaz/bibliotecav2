@@ -83,11 +83,45 @@ const EditarLibro: React.FC = () => {
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
 
+  // useEffect(() => {
+  //   console.log("ID:", id);
+  //   console.log("=============USE EFFECT============");
+  //   fetchData();
+  // }, [id, location.pathname]); // Dependencia en el ID
   useEffect(() => {
-    console.log("ID:", id);
-    console.log("=============USE EFFECT============");
-    fetchData();
-  }, [id, location.pathname]); // Dependencia en el ID
+    // Extrae el ID desde el pathname
+    const currentPath = location.pathname;
+    const pathSegments = currentPath.split('/');
+    const id = pathSegments[pathSegments.length - 1]; // Asume que el ID es el último segmento
+
+    // Lista de rutas que no deben ser consideradas como ID
+    const invalidIds = [
+      'register',
+      'menu',
+      'valores',
+      'carreras',
+      'mision',
+      'vision',
+      'reseña',
+      'objetivos',
+      'bienvenida',
+      'perfilusuario',
+      'libros',
+      'subirlibro',
+      'visualizarlibro',
+      'login',
+      'register'
+    ];
+
+    // Verifica que el id sea válido (no vacío y no en la lista de IDs inválidos)
+    const isValidId = id && !invalidIds.includes(id);
+
+    // Si el id es válido, llama a fetchData
+    if (isValidId) {
+      console.log(`Consultando el libro con ID: ${id}`);
+      fetchData(id); // Llama a tu función para obtener los datos
+    }
+  }, [location.pathname]); // Escucha cambios en el pathname
 
   const clearForm = () => {
     setIsModalOpen(false);
@@ -103,7 +137,7 @@ const EditarLibro: React.FC = () => {
     setDownloadUrl("");
   };
 
-  const fetchData = async () => {
+  const fetchData = async (id) => {
     const storedUserId = localStorage.getItem("userData");
     const encontrado = JSON.parse(storedUserId);
     const user_id = encontrado ? encontrado.id : 0;
@@ -158,6 +192,9 @@ const EditarLibro: React.FC = () => {
     setShowAlert(true); // Muestra el alerta
   };
 
+
+  console.log(bookName)
+
   const handleConfirmEdit = () => {
     setShowInput(true); // Muestra el input para el archivo
     setShowAlert(false);
@@ -169,22 +206,43 @@ const EditarLibro: React.FC = () => {
     setShowButtonUpdate(true);
   };
 
-  const handleChange = (e: CustomEvent) => {
-    const target = e.target as
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | HTMLSelectElement;
-    const { name, value } = target;
-
-    // Convert number inputs to numbers
-    const newValue =
-      name === "book_type_id" || name === "pnf_id" ? Number(value) : value;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const newValue = name === "book_type_id" || name === "pnf_id" ? Number(value) : value;
 
     setForm((prevForm) => ({
       ...prevForm,
       [name]: newValue,
     }));
+
+    // Validación en tiempo real
+    const errors: { [key: string]: string } = {};
+    if (name === "name" && !newValue) errors.name = "Este campo es obligatorio";
+    if (name === "publication_year" && !newValue) errors.publication_year = "Este campo es obligatorio";
+    if (name === "author" && !newValue) errors.author = "Este campo es obligatorio";
+    if (name === "book_type_id" && !newValue) errors.book_type_id = "Este campo es obligatorio";
+    if (name === "pnf_id" && !newValue) errors.pnf_id = "Este campo es obligatorio";
+    if (name === "description" && !newValue) errors.description = "Este campo es obligatorio";
+
+    setFormErrors(errors);
   };
+
+  // const handleChange = (e: CustomEvent) => {
+  //   const target = e.target as
+  //     | HTMLInputElement
+  //     | HTMLTextAreaElement
+  //     | HTMLSelectElement;
+  //   const { name, value } = target;
+
+  //   // Convert number inputs to numbers
+  //   const newValue =
+  //     name === "book_type_id" || name === "pnf_id" ? Number(value) : value;
+
+  //   setForm((prevForm) => ({
+  //     ...prevForm,
+  //     [name]: newValue,
+  //   }));
+  // };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -238,6 +296,10 @@ const EditarLibro: React.FC = () => {
       errors.publication_year = "Este campo es obligatorio";
     if (!form.author) errors.author = "Este campo es obligatorio";
     // if (!selectedFile ) errors.download_url = "Adjuntar PDF es obligatorio";
+    // Validación del PDF solo si showInput es falso
+    if (showInput && !selectedFile) {
+      errors.download_url = "Adjuntar PDF es obligatorio";
+    }
     if (!form.book_type_id) errors.book_type_id = "Este campo es obligatorio";
     if (!form.pnf_id) errors.pnf_id = "Este campo es obligatorio";
     if (!form.description) errors.description = "Este campo es obligatorio";
@@ -247,11 +309,15 @@ const EditarLibro: React.FC = () => {
       return;
     }
 
+    // const updatedForm = {
+    //   ...form,
+    //   download_url: downloadUrl, // Asegúrate de que downloadUrl tenga un valor válido
+    // };
+    // Construye el objeto actualizado del formulario
     const updatedForm = {
       ...form,
-      download_url: downloadUrl, // Asegúrate de que downloadUrl tenga un valor válido
+      ...(!showInput ? { bookName: form.download_url } : { download_url: downloadUrl }),
     };
-
     setIsLoading(true);
 
     try {
@@ -284,12 +350,13 @@ const EditarLibro: React.FC = () => {
 
   const handleRetry = async () => {
     setIsNetworkErrorModalOpen(false); // Close the error modal
-    await fetchData(); // Retry fetching data
+    await fetchData(id); // Retry fetching data
   };
 
   const handleCancel = () => {
     setIsNetworkErrorModalOpen(false); // Just close the modal
   };
+
 
   return (
     <>
@@ -344,9 +411,8 @@ const EditarLibro: React.FC = () => {
                           </span>
                           <IonInput
                             type="text"
-                            className={`text-font inputs-datos-usuario ${
-                              formErrors.name ? "error-input" : ""
-                            }`}
+                            className={`text-font inputs-datos-usuario ${formErrors.name ? "error-input" : ""
+                              }`}
                             placeholder="Nombre del Libro"
                             name="name"
                             value={form.name}
@@ -374,9 +440,8 @@ const EditarLibro: React.FC = () => {
                           </span>
                           <IonInput
                             type="number"
-                            className={`text-font inputs-datos-usuario ${
-                              formErrors.publication_year ? "error-input" : ""
-                            }`}
+                            className={`text-font inputs-datos-usuario ${formErrors.publication_year ? "error-input" : ""
+                              }`}
                             name="publication_year"
                             placeholder="Año de publicación"
                             value={form.publication_year}
@@ -404,9 +469,8 @@ const EditarLibro: React.FC = () => {
                           </span>
                           <IonInput
                             type="text"
-                            className={`text-font inputs-datos-usuario ${
-                              formErrors.author ? "error-input" : ""
-                            }`}
+                            className={`text-font inputs-datos-usuario ${formErrors.author ? "error-input" : ""
+                              }`}
                             placeholder="Autor"
                             name="author"
                             value={form.author}
@@ -434,9 +498,8 @@ const EditarLibro: React.FC = () => {
                             Tipo
                           </span>
                           <IonSelect
-                            className={`text-font ${
-                              formErrors.book_type_id ? "error-input" : ""
-                            }`}
+                            className={`text-font ${formErrors.book_type_id ? "error-input" : ""
+                              }`}
                             name="book_type_id"
                             placeholder="Seleccionar tipo de libro"
                             style={{
@@ -484,9 +547,8 @@ const EditarLibro: React.FC = () => {
                             PNF
                           </span>
                           <IonSelect
-                            className={`text-font ${
-                              formErrors.pnf_id ? "error-input" : ""
-                            }`}
+                            className={`text-font ${formErrors.pnf_id ? "error-input" : ""
+                              }`}
                             style={{
                               textAlign: "center",
                               width: "100%",
@@ -533,9 +595,8 @@ const EditarLibro: React.FC = () => {
                         </span>
                         <div>
                           <IonTextarea
-                            className={`text-font inputs-datos-usuario ${
-                              formErrors.description ? "error-input" : ""
-                            }`}
+                            className={`text-font inputs-datos-usuario ${formErrors.description ? "error-input" : ""
+                              }`}
                             placeholder="Reseña o sinopsis del libro"
                             name="description"
                             value={form.description}
